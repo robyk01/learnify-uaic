@@ -38,7 +38,7 @@ const ModulePage = () => {
 
                 {/* Back */}
                 <Link to="/" className="bg-blue-500 px-3 py-1 mb-6 inline-block rounded text-sm">
-                    Înapoi
+                    ← Înapoi
                 </Link>
 
                 {/* Module description */}
@@ -56,7 +56,7 @@ const ModulePage = () => {
                                         {lesson.lesson_type === 'theory' ? '📖' : 
                                          lesson.lesson_type === 'quiz' ? '❓' : '💻'}
                                     </p>
-                                    <p>{lesson.title}</p>
+                                    <p className="font-medium">{lesson.title}</p>
                                 </div>
                                 <span className="text-slate-500 text-sm">
                                     {lesson.xp_reward} XP

@@ -6,10 +6,15 @@ import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import 'highlight.js/styles/atom-one-dark.css'
 
+import confetti from 'canvas-confetti'
+
 const LessonPage = () => {
     const { slug } = useParams();
+
     const [lesson, setLesson] = useState(null)
-    const [loading, setLoading] = useState(null)
+    const [loading, setLoading] = useState(true) 
+    const [completing, setCompleting] = useState(false)
+    const [isCompleted, setIsCompleted] = useState(false)
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -21,22 +26,73 @@ const LessonPage = () => {
 
             if (error){
                 console.error("Eroare: ", error)
-            } else {
-                setLesson(data)
+                setLoading(false)
+                return
+            } 
+            
+            setLesson(data)
+
+            const {data: {session}} = await supabase.auth.getSession()
+
+            if (session?.user){
+                const {data: progress} = await supabase
+                .from('user_progress')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .eq('lesson_id', data.id)
+                .single()
+
+                if (progress) setIsCompleted(true)
             }
-            setLoading(false)
+
+        setLoading(false)
         }
 
         fetchLesson()
     }, [slug])
+
+    const handleComplete = async () => {
+        setCompleting(true)
+
+        const {data: {session}} = await supabase.auth.getSession()
+
+        if (!session){
+            alert("Trebuie sa fii logat!")
+            setCompleting(false)
+            return
+        }
+
+        const {error} = await supabase
+        .from('user_progress')
+        .insert({
+            user_id: session.user.id,
+            lesson_id: lesson.id
+        })
+
+        if (error){
+            console.error(error)
+        } else {
+            setIsCompleted(true)
+            triggerConfetti()
+        }
+        setCompleting(false)
+    }
+
+    const triggerConfetti = () => {
+        confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+        })
+    }
 
     if (loading) return <div className="text-white p-8">Lectia se incarca..</div>
     if (!lesson) return <div className="text-white p-8">Lectia nu a fost gasita</div>
 
     return(
         <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
-            <div className="max-w-4xl mx-auto">
-                <Link to="/" className="bg-blue-500 px-3 py-1 mb-6 inline-block rounded text-sm">
+            <div className="max-w-5xl mx-auto">
+                <Link to="/" className="bg-main hover:bg-blue-700 px-3 py-1 mb-6 inline-block rounded text-sm transition-colors">
                     ← Înapoi
                 </Link>
 
@@ -51,12 +107,22 @@ const LessonPage = () => {
 
                 <div className="mt-12  pt-6  border-t  border-slate-800 flex justify-between items-center">
                     <button className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-white transition">
-                        Lectia anterioara
+                        Lecția anterioară
                     </button>
 
-                    <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold shadow-lg shadow-green-900/50 transition duration-300">
-                        Finalizeaza lectia (+{lesson.xp_reward} XP)
-                    </button>
+                    {!isCompleted ? (
+                        <button
+                            onClick={handleComplete}
+                            disabled={completing}
+                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold shadow-lg shadow-green-900/50 transition duration-300">
+                            {completing ? 'Se salveaza..' : `Finalizeaza lectia (+${lesson.xp_reward} XP)` }
+                        </button>
+                    ) : (
+                        <button disabled className="bg-green-900/30 text-green-400 border border-green-800 px-6 py-3 rounded font-bold cursor-default">
+                            Lecție completată
+                        </button>
+                    )}
+                    
                 </div>
             </div>
         </div>

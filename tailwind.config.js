@@ -7,7 +7,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'display': ['Oswald', 'sans-serif'],
+        sans: ['Manrope', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
+      colors: {
+        main: "#3366FF",
       }
     },
   },

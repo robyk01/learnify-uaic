@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 const ModuleCard = ({ module }) => {
     return(
         <Link to={`/modul/${module.slug}`}>
-            <div className='bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-blue-500/50 transition-all hover:-translate-y-1 cursor-pointer group'>
+            <div className='bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-main transition-all hover:-translate-y-1 cursor-pointer group'>
                 {/* Header */}
                 <div className="flex justify-between items-start mb-2">
-                    <h2 className='text-xl font-semibold text-white group-hover:text-blue-400 transition-colors'>
+                    <h2 className='text-xl font-semibold text-white group-hover:text-main transition-colors'>
                         {module.title}
                     </h2> 
                     <span className='bg-slate-800 text-xs font-bold px-2 py-1 rounded'>

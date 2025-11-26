@@ -34,10 +34,10 @@ const ModulePage = () => {
 
     return(
         <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
 
                 {/* Back */}
-                <Link to="/" className="bg-blue-500 px-3 py-1 mb-6 inline-block rounded text-sm">
+                <Link to="/" className="bg-main hover:bg-blue-700 px-3 py-1 mb-6 inline-block rounded text-sm transition-colors">
                     ← Înapoi
                 </Link>
 
@@ -50,7 +50,7 @@ const ModulePage = () => {
                         <Link 
                             key={lesson.id}
                             to={`/lectie/${lesson.slug}`}
-                            className=" bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-blue-500 transition-colors flex justify-between items-center">
+                            className=" bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
                                 <div className="flex items-center gap-3">
                                     <p className="text-xl">
                                         {lesson.lesson_type === 'theory' ? '📖' : 

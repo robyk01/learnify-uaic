@@ -29,7 +29,13 @@ const ModulePage = () => {
         fetchModuleAndLessons()
     }, [slug])
 
-    if (loading) return <div className="text-white p-10">Se incarca materia..</div>
+    if (loading){
+        return (
+            <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            </div>
+        )
+    }
     if (!module) return <div className="text-white p-10">Modulul nu a fost gasit.</div>
 
     return(

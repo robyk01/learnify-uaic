@@ -15,6 +15,7 @@ const LessonPage = () => {
     const [loading, setLoading] = useState(true) 
     const [completing, setCompleting] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
+    const [parent, setParent] = useState(null)
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -31,6 +32,14 @@ const LessonPage = () => {
             } 
             
             setLesson(data)
+
+            const { data: lessonParent } = await supabase
+            .from('modules')
+            .select('*')
+            .eq('id', data.module_id)
+            .single()
+
+            if (!parent) setParent(lessonParent)
 
             const {data: {session}} = await supabase.auth.getSession()
 
@@ -86,13 +95,19 @@ const LessonPage = () => {
         })
     }
 
-    if (loading) return <div className="text-white p-8">Lectia se incarca..</div>
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            </div>
+        )
+    }
     if (!lesson) return <div className="text-white p-8">Lectia nu a fost gasita</div>
 
     return(
         <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
             <div className="max-w-5xl mx-auto">
-                <Link to="/" className="bg-main hover:bg-blue-700 px-3 py-1 mb-6 inline-block rounded text-sm transition-colors">
+                <Link to={`/modul/${parent.slug}`} className="bg-main hover:bg-blue-700 px-3 py-1 mb-6 inline-block rounded text-sm transition-colors">
                     ← Înapoi
                 </Link>
 

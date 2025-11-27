@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
+import { Quiz } from "../components/Quiz"
 
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
@@ -21,7 +22,7 @@ const LessonPage = () => {
         const fetchLesson = async () => {
             const {data, error} = await supabase
             .from('lessons')
-            .select('*')
+            .select('*, quiz_questions(*)')
             .eq('slug', slug)
             .single()
 

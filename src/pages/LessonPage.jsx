@@ -14,9 +14,10 @@ const LessonPage = () => {
 
     const [lesson, setLesson] = useState(null)
     const [loading, setLoading] = useState(true) 
+    const [parent, setParent] = useState(null)
+
     const [completing, setCompleting] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
-    const [parent, setParent] = useState(null)
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -40,7 +41,7 @@ const LessonPage = () => {
             .eq('id', data.module_id)
             .single()
 
-            if (!parent) setParent(lessonParent)
+            setParent(lessonParent)
 
             const {data: {session}} = await supabase.auth.getSession()
 
@@ -60,6 +61,10 @@ const LessonPage = () => {
 
         fetchLesson()
     }, [slug])
+
+    const handleQuizComplete = async (score) => {
+        await handleComplete()
+    }
 
     const handleComplete = async () => {
         setCompleting(true)
@@ -108,38 +113,48 @@ const LessonPage = () => {
     return(
         <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
             <div className="max-w-5xl mx-auto">
-                <Link to={`/modul/${parent.slug}`} className="bg-main hover:bg-blue-700 px-3 py-1 mb-6 inline-block rounded text-sm transition-colors">
+                <Link to={parent ? `/modul/${parent.slug}` : '/'} className="bg-main hover:bg-blue-700 px-3 py-1 mb-6 inline-block rounded text-sm transition-colors">
                     ← Înapoi
                 </Link>
 
                 {/* Lesson */}
                 <h1 className="text-3xl font-bold text-white mb-8 border-b border-slate-800 pb-4">{lesson.title}</h1>
 
-                <div className="prose prose-invert max-w-none prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800">
-                    <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                        {lesson.content}
-                    </ReactMarkdown>
-                </div>
+                {lesson.lesson_type === 'quiz' ? (
+                    <div className="">
+                        <Quiz 
+                            questions={lesson.quiz_questions}
+                            onComplete={handleQuizComplete}
+                        />
+                    </div>
+                ) : (
+                    <>
+                    <div className="prose prose-invert max-w-none prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800">
+                        <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                            {lesson.content}
+                        </ReactMarkdown>
+                    </div>
 
-                <div className="mt-12  pt-6  border-t  border-slate-800 flex justify-between items-center">
-                    <button className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-white transition">
-                        Lecția anterioară
-                    </button>
+                     <div className="mt-12  pt-6  border-t  border-slate-800 flex justify-between items-center">
+                        <button className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-white transition">
+                            Lecția anterioară
+                        </button>
 
-                    {!isCompleted ? (
-                        <button
-                            onClick={handleComplete}
-                            disabled={completing}
-                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold shadow-lg shadow-green-900/50 transition duration-300">
-                            {completing ? 'Se salveaza..' : `Finalizeaza lectia (+${lesson.xp_reward} XP)` }
-                        </button>
-                    ) : (
-                        <button disabled className="bg-green-900/30 text-green-400 border border-green-800 px-6 py-3 rounded font-bold cursor-default">
-                            Lecție completată
-                        </button>
-                    )}
-                    
-                </div>
+                        {!isCompleted ? (
+                            <button
+                                onClick={handleComplete}
+                                disabled={completing}
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold shadow-lg shadow-green-900/50 transition duration-300">
+                                {completing ? 'Se salveaza..' : `Finalizeaza lectia (+${lesson.xp_reward} XP)` }
+                            </button>
+                        ) : (
+                            <button disabled className="bg-green-900/30 text-green-400 border border-green-800 px-6 py-3 rounded font-bold cursor-default">
+                                Lecție completată
+                            </button>
+                        )}
+                    </div>
+                </>
+                )}
             </div>
         </div>
     );

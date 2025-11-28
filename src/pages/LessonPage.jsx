@@ -129,7 +129,7 @@ const LessonPage = () => {
                     </div>
                 ) : (
                     <>
-                    <div className="prose prose-invert max-w-none prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800">
+                    <div className="prose prose-invert max-w-none prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 [&_pre_code]:bg-transparent">
                         <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
                             {lesson.content}
                         </ReactMarkdown>

@@ -9,6 +9,7 @@ export function Quiz({questions, onComplete}) {
     
     const [isChecking, setIsChecking] = useState(false)
     const [isFinished, setIsFinished] = useState(false)
+    const [isCompleted, setIsCompleted] = useState(false)
 
     if (!questions || questions.length === 0 ) return <div>Nu sunt întrebări.</div>
 
@@ -39,6 +40,7 @@ export function Quiz({questions, onComplete}) {
             setIsChecking(false)
         } else {
             setIsFinished(true)
+            if (!isCompleted) setIsCompleted(true)
             onComplete(score)
         }
     }
@@ -67,39 +69,55 @@ export function Quiz({questions, onComplete}) {
 
     return(
         <div className="max-w-2xl mx-auto">
-            <div className="mb-8">
-                <div className="flex justify-between text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">
-                    <span>Progres</span>
-                    <span>Intrebarea {currIndex + 1} din {questions.length}</span>
-                </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div className="bg-blue-600 h-full transition-all duration-500 ease-out shadow-[0_0_10px_#2563eb]" style={{ width: `${progress}%` }}>
-                    </div>
-                </div>
-            </div>
-
             {isFinished ? (
-                <div className="max-w-full bg-slate-800/50 rounded-lg p-8">
-                    <div className="w-full flex justify-center mb-8">
-                        <h2 className="text-4xl font-bold">Felicitari! 🎉</h2>
+                <div className="relative max-w-full bg-slate-900/80 border border-slate-700/50 shadow-[0_15px_40px] shadow-blue-950/50 rounded-2xl p-10 text-center overflow-hidden">
+
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-blue-300/20 blur-[80px] rounded-full pointer-events-none"></div>
+
+                    <div className="relative z-10 mb-8">
+                        {score >= questions.length / 2 
+                        ? (<h2 className="text-3xl font-bold text-white">Felicitări! 🎉</h2>)
+                        : (<h2 className="text-3xl font-bold text-white">Mai încearcă.. </h2>)
+                        }
+                        
                     </div>
 
-                    <div className="space-y-4 mb-12">
-                        <div className="text-xl w-full flex justify-between">
-                            <span>Grile corecte:</span>
-                            <span>{score}/{questions.length}</span>
+                    <div className="mb-8">
+                        <div className="flex items-baseline justify-center gap-1">
+                            <span className="text-8xl font-black bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent drop-shadow-2xl">{score}</span>
+                            <span className="text-3xl text-slate-500 font-bold">/{questions.length}</span>
                         </div>
-                        <div className="text-xl w-full flex justify-between">
-                            <span>XP primit:</span>
-                            <span>10</span>
-                        </div>
+                        <p className="text-slate-400 text-sm font-medium tracking-wide mt-2">Răspunsuri corecte</p>
                     </div>
+
+                    {!isCompleted && (
+                        <div className="mb-10 flex justify-center">
+                            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 px-6 py-2 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                                <span className="text-xl">✨</span>
+                                <span className="text-blue-300 font-bold font-mono text-lg">
+                                    +{10} XP
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                    
+
                     <div className="w-full flex justify-center">
-                        <Link to='/' className="px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 bg-white text-slate-900 hover:bg-slate-200 shadow-lg shadow-white/20">Înapoi la lecții</Link>
+                        <Link to='/' className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 bg-white text-slate-900 hover:bg-slate-200">Înapoi la lecții</Link>
                     </div>
                 </div>
             ) : (
                 <>
+                    <div className="mb-8">
+                        <div className="flex justify-between text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">
+                            <span>Progres</span>
+                            <span>Intrebarea {currIndex + 1} din {questions.length}</span>
+                        </div>
+                        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div className="bg-blue-600 h-full transition-all duration-500 ease-out shadow-[0_0_10px_#2563eb]" style={{ width: `${progress}%` }}>
+                            </div>
+                        </div>
+                    </div>
                     <div className="animate-fade-in">
                         <h2 className="text-2xl md-text-3xl font-bold text-white mb-8 leading-tight">{currQuestion.question}</h2>
 

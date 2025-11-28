@@ -1,11 +1,14 @@
 import { useState } from "react";
 import confetti from "canvas-confetti";
+import { Link } from "react-router-dom";
 
 export function Quiz({questions, onComplete}) {
     const [currIndex, setCurrIndex] = useState(0)
     const [selectedOption, setSelectedOption] = useState(null)
-    const [isChecking, setIsChecking] = useState(false)
     const [score, setScore] = useState(0)
+    
+    const [isChecking, setIsChecking] = useState(false)
+    const [isFinished, setIsFinished] = useState(false)
 
     if (!questions || questions.length === 0 ) return <div>Nu sunt întrebări.</div>
 
@@ -35,6 +38,7 @@ export function Quiz({questions, onComplete}) {
             setSelectedOption(null)
             setIsChecking(false)
         } else {
+            setIsFinished(true)
             onComplete(score)
         }
     }
@@ -74,55 +78,80 @@ export function Quiz({questions, onComplete}) {
                 </div>
             </div>
 
-            <div className="animate-fade-in">
-                <h2 className="text-2xl md-text-3xl font-bold text-white mb-8 leading-tight">{currQuestion.question}</h2>
+            {isFinished ? (
+                <div className="max-w-full bg-slate-800/50 rounded-lg p-8">
+                    <div className="w-full flex justify-center mb-8">
+                        <h2 className="text-4xl font-bold">Felicitari! 🎉</h2>
+                    </div>
 
-                <div className="space-y-3">
-                    {currQuestion.options.map((option, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleOptionClick(option)}
-                            className={getOptionClasses(option)}>
-
-                        <span>{option.text}</span>
-
-                        {isChecking && option.is_correct && (
-                            <span className="text-green-500 text-xl">✓</span>
-                        )}
-                        {isChecking && selectedOption?.id === option.id && !option.is_correct && (
-                            <span className="text-red-500 text-xl">✕</span>
-                        )}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-slate-800">
-                {isChecking && currQuestion.explanation && (
-                    <div className="mb-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700 text-slate-300 text-sm leading-relaxed flex gap-3 items-center">
-                        <span className="text-xl">💡</span>
-                        <div>
-                            <strong className="text-white block mb-1">Explicație:</strong>
-                            {currQuestion.explanation}
+                    <div className="space-y-4 mb-12">
+                        <div className="text-xl w-full flex justify-between">
+                            <span>Grile corecte:</span>
+                            <span>{score}/{questions.length}</span>
+                        </div>
+                        <div className="text-xl w-full flex justify-between">
+                            <span>XP primit:</span>
+                            <span>10</span>
                         </div>
                     </div>
-                )}
+                    <div className="w-full flex justify-center">
+                        <Link to='/' className="px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 bg-white text-slate-900 hover:bg-slate-200 shadow-lg shadow-white/20">Înapoi la lecții</Link>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <div className="animate-fade-in">
+                        <h2 className="text-2xl md-text-3xl font-bold text-white mb-8 leading-tight">{currQuestion.question}</h2>
 
-                <button
-                    onClick={handleMainButton}
-                    disabled={!selectedOption && !isChecking}
-                    className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 ${
-                        !selectedOption && !isChecking ? 
-                        "bg-slate-800 text-slate-500 cursor-not-allowed"
-                        : isChecking
-                            ? "bg-white text-slate-900 hover:bg-slate-200 shadow-lg shadow-white/20"
-                            : "bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/20"
-                        }`}>
-                            {isChecking
-                            ? (currIndex + 1 < questions.length ? "Următoarea întrebare →" : "Vezi rezultat final")
-                            : "Verifică răspunsul"}
-                </button>
-            </div>
+                        <div className="space-y-3">
+                            {currQuestion.options.map((option, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handleOptionClick(option)}
+                                    className={getOptionClasses(option)}>
+
+                                <span>{option.text}</span>
+
+                                {isChecking && option.is_correct && (
+                                    <span className="text-green-500 text-xl">✓</span>
+                                )}
+                                {isChecking && selectedOption?.id === option.id && !option.is_correct && (
+                                    <span className="text-red-500 text-xl">✕</span>
+                                )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t border-slate-800">
+                        {isChecking && currQuestion.explanation && (
+                            <div className="mb-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700 text-slate-300 text-sm leading-relaxed flex gap-3 items-center">
+                                <span className="text-xl">💡</span>
+                                <div>
+                                    <strong className="text-white block mb-1">Explicație:</strong>
+                                    {currQuestion.explanation}
+                                </div>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={handleMainButton}
+                            disabled={!selectedOption && !isChecking}
+                            className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 ${
+                                !selectedOption && !isChecking ? 
+                                "bg-slate-800 text-slate-500 cursor-not-allowed"
+                                : isChecking
+                                    ? "bg-white text-slate-900 hover:bg-slate-200 shadow-lg shadow-white/20"
+                                    : "bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/20"
+                                }`}>
+                                    {isChecking
+                                    ? (currIndex + 1 < questions.length ? "Următoarea întrebare →" : "Vezi rezultat final")
+                                    : "Verifică răspunsul"}
+                        </button>
+                    </div>
+                </>
+            )}
+            
         </div>
     );
 

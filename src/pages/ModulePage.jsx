@@ -43,8 +43,9 @@ const ModulePage = () => {
             <div className="max-w-5xl mx-auto">
 
                 {/* Back */}
-                <Link to="/" className="bg-main hover:bg-blue-700 px-3 py-1 mb-6 inline-block rounded text-sm transition-colors">
-                    ← Înapoi
+                <Link to="/" className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 text-sm font-medium">
+                    <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                    Înapoi
                 </Link>
 
                 {/* Module description */}

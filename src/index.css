@@ -8,6 +8,11 @@ body {
   @apply bg-slate-950 text-slate-200; 
 }
 
+html {
+  scroll-padding-top: 100px;
+  scroll-behavior: smooth;
+}
+
 .glass-nav {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px); 

@@ -7,6 +7,10 @@ import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import 'highlight.js/styles/atom-one-dark.css'
 
+import rehypeSlug from "rehype-slug";
+import { getHeadings } from "../utils/getHeadings";
+import { TableOfContents } from "../components/TableOfContents";
+
 import confetti from 'canvas-confetti'
 
 const LessonPage = () => {
@@ -101,6 +105,8 @@ const LessonPage = () => {
         })
     }
 
+    const headings = lesson?.content ? getHeadings(lesson.content) : [];
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -111,50 +117,82 @@ const LessonPage = () => {
     if (!lesson) return <div className="text-white p-8">Lectia nu a fost gasita</div>
 
     return(
-        <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
-            <div className="max-w-5xl mx-auto">
-                <Link to={parent ? `/modul/${parent.slug}` : '/'} className="bg-main hover:bg-blue-700 px-3 py-1 mb-6 inline-block rounded text-sm transition-colors">
-                    ← Înapoi
-                </Link>
+        <div className="min-h-screen bg-slate-950 text-slate-200 p-6">
+            <div className="max-w-7xl mx-auto">
+                
+                <div className="lg:grid lg:grid-cols-12 lg:gap-12">
+                    {lesson.lesson_type === 'theory' && (
+                        <div className="hidden lg:block lg:col-span-3 sticky top-8 py-2">
+                            <Link to={parent ? `/modul/${parent.slug}` : '/'} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 text-sm font-medium">
+                                <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                                Înapoi la lecții
+                            </Link>
+                            <TableOfContents headings={headings} />
+                        </div>
+                    )}
+                    
+                    
+                    <div className={lesson.lesson_type === 'quiz' ? "lg:col-span-12" : "lg:col-span-9"}>
+                        {lesson.lesson_type === 'quiz' && (
+                            <div className="mb-6">
+                                <Link to={parent ? `/modul/${parent.slug}` : '/'} className={lesson.lesson_type === 'quiz' ? "hidden lg:flex group items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 font-medium" : "hidden"}>
+                                    <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                                    Înapoi la lecții
+                                </Link>
+                            </div>
+                        )}
 
-                {/* Lesson */}
-                <h1 className="text-3xl font-bold text-white mb-8 border-b border-slate-800 pb-4">{lesson.title}</h1>
+                        <div className="mb-10 border-b border-slate-800 pb-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-blue-500/20">
+                                    {lesson.lesson_type === 'theory' ? 'Teorie' : 'Quiz'}
+                                </span>
+                                <span className="text-slate-500 text-sm font-mono">
+                                    {lesson.xp_reward} XP
+                                </span>
+                            </div>
+                            <h1 className="font-display text-4xl md:text-5xl font-bold text-white leading-tight">
+                                {lesson.title}
+                            </h1>
+                        </div>
 
-                {lesson.lesson_type === 'quiz' ? (
-                    <div className="">
-                        <Quiz 
-                            questions={lesson.quiz_questions}
-                            onComplete={handleQuizComplete}
-                        />
-                    </div>
-                ) : (
-                    <>
-                    <div className="prose prose-invert max-w-none prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 [&_pre_code]:bg-transparent">
-                        <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                            {lesson.content}
-                        </ReactMarkdown>
-                    </div>
-
-                     <div className="mt-12  pt-6  border-t  border-slate-800 flex justify-between items-center">
-                        <button className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-white transition">
-                            Lecția anterioară
-                        </button>
-
-                        {!isCompleted ? (
-                            <button
-                                onClick={handleComplete}
-                                disabled={completing}
-                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold shadow-lg shadow-green-900/50 transition duration-300">
-                                {completing ? 'Se salveaza..' : `Finalizeaza lectia (+${lesson.xp_reward} XP)` }
-                            </button>
+                        {lesson.lesson_type === 'quiz' ? (
+                            <div className="max-w-3xl mx-auto">
+                                <Quiz 
+                                    questions={lesson.quiz_questions}
+                                    onComplete={handleQuizComplete}
+                                />
+                            </div>
                         ) : (
-                            <button disabled className="bg-green-900/30 text-green-400 border border-green-800 px-6 py-3 rounded font-bold cursor-default">
-                                Lecție completată
-                            </button>
+                            <>
+                            <div className="prose prose-invert max-w-5xl bg-slate-900/50 p-10 rounded-2xl prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 [&_pre_code]:bg-transparent">
+                                <ReactMarkdown rehypePlugins={[rehypeHighlight, rehypeSlug]}>
+                                    {lesson.content}
+                                </ReactMarkdown>
+                            </div>
+
+                            <div className="mt-12  pt-6  border-t  border-slate-800 flex justify-between items-center">
+                                <button className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-white transition">
+                                    Lecția anterioară
+                                </button>
+
+                                {!isCompleted ? (
+                                    <button
+                                        onClick={handleComplete}
+                                        disabled={completing}
+                                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold shadow-lg shadow-green-900/50 transition duration-300">
+                                        {completing ? 'Se salveaza..' : `Finalizeaza lectia (+${lesson.xp_reward} XP)` }
+                                    </button>
+                                ) : (
+                                    <button disabled className="bg-green-900/30 text-green-400 border border-green-800 px-6 py-3 rounded font-bold cursor-default">
+                                        Lecție completată
+                                    </button>
+                                )}
+                            </div>
+                        </>
                         )}
                     </div>
-                </>
-                )}
+                </div>
             </div>
         </div>
     );

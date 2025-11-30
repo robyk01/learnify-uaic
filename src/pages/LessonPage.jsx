@@ -8,6 +8,7 @@ import rehypeHighlight from 'rehype-highlight'
 import 'highlight.js/styles/atom-one-dark.css'
 
 import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 import { getHeadings } from "../utils/getHeadings";
 import { TableOfContents } from "../components/TableOfContents";
 
@@ -166,7 +167,7 @@ const LessonPage = () => {
                         ) : (
                             <>
                             <div className="prose prose-invert max-w-5xl bg-slate-900/50 p-10 rounded-2xl prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 [&_pre_code]:bg-transparent">
-                                <ReactMarkdown rehypePlugins={[rehypeHighlight, rehypeSlug]}>
+                                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight, rehypeSlug]}>
                                     {lesson.content}
                                 </ReactMarkdown>
                             </div>

@@ -52,17 +52,17 @@ export function TableOfContents( {headings} ){
                             }}
                             className={`
                                 block py-2 pr-2 text-sm transition-all duration-300
-                                ${heading.level === 3 ? "pl-8" : "pl-6"} 
+                                ${heading.level === 3 ? "pl-8" : "pl-6 font-bold text-white"} 
                                 ${activeId === heading.id 
                                     ? "text-blue-400" 
-                                    : "text-slate-500 hover:text-slate-300" 
+                                    : "text-slate-400 hover:text-slate-300" 
                                 }
                             `}
                         >
                             <span 
                                 className={`absolute left-[7px] top-1/2 -translate-y-1/2 transition-all duration-300 rounded-full border-2 
                                 ${activeId === heading.id 
-                                    ? "w-3 h-3 bg-blue-500 border-blue-400 shadow-[0_0_10px_#3b82f6]" 
+                                    ? "w-3 h-3 bg-blue-500 border-blue-400 shadow-[0_0_10px_#3b82f6] left-[5px]" 
                                     : "w-2 h-2 bg-slate-900 border-slate-600"
                                 }`}
                             />

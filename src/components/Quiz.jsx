@@ -2,7 +2,7 @@ import { useState } from "react";
 import confetti from "canvas-confetti";
 import { Link } from "react-router-dom";
 
-export function Quiz({questions, onComplete}) {
+export function Quiz({lesson, parent,  onComplete}) {
     const [currIndex, setCurrIndex] = useState(0)
     const [selectedOption, setSelectedOption] = useState(null)
     const [score, setScore] = useState(0)
@@ -10,6 +10,8 @@ export function Quiz({questions, onComplete}) {
     const [isChecking, setIsChecking] = useState(false)
     const [isFinished, setIsFinished] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
+
+    const questions = lesson.quiz_questions;
 
     if (!questions || questions.length === 0 ) return <div>Nu sunt întrebări.</div>
 
@@ -103,7 +105,9 @@ export function Quiz({questions, onComplete}) {
                     
 
                     <div className="w-full flex justify-center">
-                        <Link to='/' className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 bg-white text-slate-900 hover:bg-slate-200">Înapoi la lecții</Link>
+                        <Link to={`/modul/${parent.slug}`} className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 bg-white text-slate-900 hover:bg-slate-200">
+                            Înapoi la lecții
+                        </Link>
                     </div>
                 </div>
             ) : (

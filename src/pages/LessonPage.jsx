@@ -24,6 +24,18 @@ const LessonPage = () => {
     const [completing, setCompleting] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
 
+    function shuffleArray(array){
+        if (!array) return [];
+
+        const shuffled = [...array]
+        for (let i = shuffled.length - 1; i > 0; i--){
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+
+        return shuffled;
+    }
+
     useEffect(() => {
         const fetchLesson = async () => {
             const {data, error} = await supabase
@@ -37,6 +49,16 @@ const LessonPage = () => {
                 setLoading(false)
                 return
             } 
+
+            if (data.quiz_questions && data.quiz_questions.length > 0){
+                data.quiz_questions = shuffleArray(data.quiz_questions);
+
+                data.quiz_questions.forEach((question) => {
+                    if (question.options){
+                        question.options = shuffleArray(question.options);
+                    }
+                });
+            }
             
             setLesson(data)
 
@@ -68,7 +90,12 @@ const LessonPage = () => {
     }, [slug])
 
     const handleQuizComplete = async (score) => {
-        await handleComplete()
+        const totalQ = lesson.quiz_questions.length;
+        const hasPassed = score >= totalQ / 2;
+
+        if (hasPassed){
+            await handleComplete();
+        }
     }
 
     const handleComplete = async () => {
@@ -160,7 +187,8 @@ const LessonPage = () => {
                         {lesson.lesson_type === 'quiz' ? (
                             <div className="max-w-3xl mx-auto">
                                 <Quiz 
-                                    questions={lesson.quiz_questions}
+                                    lesson={lesson}
+                                    parent={parent}
                                     onComplete={handleQuizComplete}
                                 />
                             </div>

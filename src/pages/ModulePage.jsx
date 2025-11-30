@@ -61,7 +61,7 @@ const ModulePage = () => {
                                 <div className="flex items-center gap-3">
                                     <p className="text-xl">
                                         {lesson.lesson_type === 'theory' ? '📖' : 
-                                         lesson.lesson_type === 'quiz' ? '❓' : '💻'}
+                                         lesson.lesson_type === 'quiz' ? '🧩' : '💻'}
                                     </p>
                                     <p className="font-medium">{lesson.title}</p>
                                 </div>

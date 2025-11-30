@@ -30,7 +30,7 @@ export function TableOfContents( {headings} ){
     if (headings.length === 0) return null;
 
     return(
-        <nav className="sticky top-24 w-64 bg-slate-900/50 border border-slate-800 rounded-xl p-6 shadow-2xl shadow-blue-900/20 max-h-[80vh] overflow-y-auto">
+        <nav className="sticky top-24 w-64 bg-slate-900/50 border border-slate-800 rounded-xl p-4 shadow-2xl shadow-blue-900/20 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-4">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                     Cuprins

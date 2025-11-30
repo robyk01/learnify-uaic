@@ -52,13 +52,13 @@ export function Quiz({questions, onComplete}) {
             if (option.is_correct){
                 return base + "border-green-500 bg-green-500/10 text-green-400"
             }
-            if (selectedOption?.id === option.id && !option.is_correct){
+            if (selectedOption === option && !option.is_correct){
                 return base + "border-red-500 bg-red-500/10 text-red-400"
             }
             return base + "border-slate-800 text-slate-500 opacity-50"
         }
 
-        if (selectedOption?.id === option.id){
+        if (selectedOption === option){
             return base + "border-blue-500 bg-blue-500/10 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)] scale-[1.02]"
         }
 
@@ -133,7 +133,7 @@ export function Quiz({questions, onComplete}) {
                                 {isChecking && option.is_correct && (
                                     <span className="text-green-500 text-xl">✓</span>
                                 )}
-                                {isChecking && selectedOption?.id === option.id && !option.is_correct && (
+                                {isChecking && selectedOption === option && !option.is_correct && (
                                     <span className="text-red-500 text-xl">✕</span>
                                 )}
                                 </button>

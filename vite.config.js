@@ -6,7 +6,13 @@ export default defineConfig({
   plugins: [react()],
   
   optimizeDeps: {
-    exclude: ['@supabase/auth-ui-react', '@supabase/auth-ui-shared'],
+    include: ['@supabase/auth-ui-react', '@supabase/auth-ui-shared'],
+  },
+
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
   },
 
   resolve: {

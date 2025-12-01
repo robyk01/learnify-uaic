@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import ModuleCard from '../components/ModuleCard'
 
-const Home = () => {
+export default function Home() {
     const [modules, setModules] = useState([])
     const [error, setError] = useState(null)
+    const [profile, setProfile] = useState(null)
 
     useEffect(() => {
     const fetchModules = async () => {
@@ -20,6 +21,18 @@ const Home = () => {
         setModules(data)
         console.log('Date primite: ', data)
         }
+
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (session?.user) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+          
+          setProfile(profileData)
+      }
     }
 
     fetchModules()
@@ -30,7 +43,7 @@ const Home = () => {
 
         <div className="max-w-5xl mx-auto mb-20 text-center">
             <h1 className='text-4xl font-bold text-white mb-2'>
-                Learnify UAIC
+                Salut, {profile ? <span className="text-blue-500">{profile?.username}</span> : "student"}! 👋
             </h1>
             <p className='text-slate-400 text-lg'>
                 Pregătește-te pentru structuri de date și algoritmi.
@@ -49,5 +62,3 @@ const Home = () => {
         </div>
     )
 }
-
-export default Home

@@ -1,0 +1,73 @@
+import { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
+import { Link } from "react-router-dom";
+
+export default function Leaderboard() {
+    const [users, setUsers] = useState([])
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            const {data, error} = await supabase
+            .from("profiles")
+            .select("*")
+            .order("xp", {ascending: false})
+
+            if (!error) setUsers(data)
+        }
+
+        fetchUsers()
+    }, []);
+
+    return(
+        <div className='min-h-screen bg-slate-950 text-slate-200 p-8 font-sans'>
+            <div className="max-w-5xl mx-auto text-center">
+
+                <div className="flex items-center justify-between mb-12">
+                    <Link to={`/`} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">
+                                <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                                Înapoi acasă
+                            </Link>
+                    <h1 className="text-3xl md:text-4xl font-bold text-white font-display">
+                        Top studenți 🏆
+                    </h1>
+                    <div className="w-20"></div> {/* Spacer invizibil pt centrare */}
+                </div>
+
+                <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+                    <div className="grid grid-cols-12 gap-4 p-4 border-b border-slate-800 bg-slate-900/80 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <div className="col-span-2 text-center">Loc</div>
+                        <div className="col-span-7 text-left">Student</div>
+                        <div className="col-span-3 text-right pr-4">XP Total</div>
+                    </div>
+
+                    <div className="divide-y divide-slate-800/80">
+                        {users.map((user, index) => (
+                            <div key={user.id}
+                                className={`grid grid-cols-12 gap-4 p-4 items-center transition-all duration-200
+                                            ${index === 0 ? "bg-yellow-500/30 border-yellow-500" : 
+                                            index == 1 ? "bg-slate-400/40 border-slate-700" : 
+                                            index == 2 ? "bg-orange-700/30 border-orange-700" : ""
+                                            }`}>
+
+                                <div className="col-span-2 flex justify-center items-center">
+                                    {index + 1}
+                                </div>
+
+                                <div className="col-span-7 flex items-center gap-3">
+                                    {user.username}
+                                </div>
+
+                                <div className="col-span-3 text-right pr-4">
+                                    <span className="font-mono font-bold text-lg">
+                                        {user.xp}
+                                    </span>
+                                    <span className="text-xs text-slate-400 ml-2">XP</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

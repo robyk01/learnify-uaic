@@ -4,6 +4,7 @@ import ModulePage from "./pages/ModulePage";
 import LessonPage from './pages/LessonPage';
 import Navbar from "./components/Navbar";
 import LoginPage from "./pages/LoginPage";
+import Leaderboard from "./pages/Leaderboard";
 
 function App() {
   return(
@@ -14,6 +15,7 @@ function App() {
         <Route path="/modul/:slug" element={<ModulePage />} />
         <Route path="/lectie/:slug" element={<LessonPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/clasament" element={<Leaderboard />} />
 
         <Route path="*" element={<div className="text-white p-10">404 - Pagina nu a fost gasita!</div>} />
       </Routes>

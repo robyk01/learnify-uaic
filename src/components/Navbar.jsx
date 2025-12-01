@@ -110,7 +110,7 @@ const Navbar = () => {
             </nav>
 
             <div className="w-full fixed bottom-0 bg-slate-900 rounded-t-3xl border-t border-slate-600 z-10">
-                <ul className="w-full flex justify-between md:hidden lg:hidden px-20 list-none gap-1 text-slate-400 text-sm font-medium cursor-pointer">
+                <ul className=" flex justify-around md:hidden lg:hidden list-none gap-1 text-slate-400 text-sm font-medium cursor-pointer">
                         <NavLink
                             to="/"
                             className={({ isActive }) => `p-6 ${isActive ? "text-white" : ""}`}>

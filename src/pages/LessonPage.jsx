@@ -200,10 +200,10 @@ const LessonPage = () => {
                                 </ReactMarkdown>
                             </div>
 
-                            <div className="mt-12  pt-6  border-t  border-slate-800 flex justify-between items-center">
-                                <button className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-white transition">
+                            <div className="mt-12  pt-6  border-t  border-slate-800 flex justify-end items-center">
+                                {/* <button className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-white transition">
                                     Lecția anterioară
-                                </button>
+                                </button> */}
 
                                 {!isCompleted ? (
                                     <button

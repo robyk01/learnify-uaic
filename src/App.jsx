@@ -5,11 +5,13 @@ import LessonPage from './pages/LessonPage';
 import Navbar from "./components/Navbar";
 import LoginPage from "./pages/LoginPage";
 import Leaderboard from "./pages/Leaderboard";
+import { FeedbackBtn } from "./components/Feedback";
 
 function App() {
   return(
     <BrowserRouter>
     <Navbar />
+    <FeedbackBtn />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/modul/:slug" element={<ModulePage />} />

@@ -194,7 +194,7 @@ const LessonPage = () => {
                             </div>
                         ) : (
                             <>
-                            <div className="prose prose-invert max-w-5xl bg-slate-900/50 p-10 rounded-2xl prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 [&_pre_code]:bg-transparent">
+                            <div className="prose prose-invert max-w-5xl bg-slate-900/50 p-4 md:p-10 rounded-2xl prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 [&_pre_code]:bg-transparent">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight, rehypeSlug]}>
                                     {lesson.content}
                                 </ReactMarkdown>

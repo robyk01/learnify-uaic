@@ -66,7 +66,7 @@ const Navbar = () => {
 
                         {/* Logo */}
                         <Link to='/' className="text-xl font-bold text-white flex items-center gap-2">
-                            Learnify
+                            <img src="/logo.png" className="h-8"></img>
                             <span className="bg-main text-white px-2 py-1 rounded-lg text-xs">UAIC</span>
                         </Link>
 

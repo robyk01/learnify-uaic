@@ -6,6 +6,7 @@ import { Home, Code, Trophy } from "lucide-react";
 
 const Navbar = () => {
     const [profile, setProfile] = useState(null)
+    const [openProfile, setOpenProfile] = useState(null)
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -58,6 +59,8 @@ const Navbar = () => {
         setProfile(null)
     }
 
+    
+
     return(
         <>
             <nav className="sticky top-0 w-full z-50 glass-nav border-b border-slate-800">
@@ -91,24 +94,40 @@ const Navbar = () => {
                             </NavLink>
                         </ul>
                             
-
-                        <div>
                             {profile ? (
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-3 bg-slate-800/50 px-3 py-1 rounded-full border border-white/10">
-                                        <span className="text-xs font-bold text-slate-400">Lvl {profile.level}</span>
-                                        <span className="text-sm font-bold text-blue-400 font-mono">{profile.xp} XP</span>
-                                    </div>
-                                    <button onClick={handleLogout} className="text-white text-sm bg-[#3366FF] hover:bg-blue-700 px-3 py-1.5 rounded font-medium transition">Logout</button>
+                                <div className="relative">
+                                    <button onClick={() => setOpenProfile(!openProfile)} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-900 cursor-pointer">R</button>
+                                    
+                                    {openProfile && (
+                                        <div className="absolute flex flex-col gap-2 right-0 mt-4 px-2 w-48 py-4 bg-slate-900 rounded-xl border border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+                                            <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-slate-800 text-slate-300 hover:text-white text-nowrap ">
+                                                <span className="text-xs font-bold text-slate-400">Lvl {profile.level}</span>
+                                                <span className="text-sm font-bold text-blue-400 font-mono">{profile.xp} XP</span>
+                                            </div>
+                                            <a href="/profil" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Profil</a>
+                                            <a href="/setari" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Setări</a>
+                                            <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 rounded transition">Logout</button>
+                                    </div> )}
                                 </div>
+                                
+                                
                             ) : (
                                 <Link to="/login" className="text-white text-sm bg-main hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition">Intra in cont</Link>
                             )}
-                        </div>
+
                     </div>
                 </div>
             </nav>
+            
+            {/* Click outside to close menu */}
+            {openProfile && (
+                <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setOpenProfile(false)}
+                ></div>
+            )}
 
+            {/* Mobile Menu Bottom */}
             <div className="w-full fixed bottom-0 bg-slate-900 rounded-t-3xl border-t border-slate-600 z-10">
                 <ul className=" flex justify-around md:hidden lg:hidden list-none gap-1 text-slate-400 text-sm font-medium cursor-pointer">
                         <NavLink

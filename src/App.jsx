@@ -11,8 +11,8 @@ import Profile from "./pages/Profile";
 function App() {
   return(
     <BrowserRouter>
-    <Navbar />
-    <FeedbackBtn />
+      <Navbar />
+      <FeedbackBtn />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/modul/:slug" element={<ModulePage />} />

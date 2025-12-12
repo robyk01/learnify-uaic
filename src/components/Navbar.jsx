@@ -65,14 +65,15 @@ const Navbar = () => {
         <>
             <nav className="sticky top-0 w-full z-50 glass-nav border-b border-slate-800">
                 <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-10">
-                    <div className="flex justify-between items-center h-16">
+                    <div className="flex justify-center items-center h-16 relative">
 
                         {/* Logo */}
-                        <Link to='/' className="text-xl font-bold text-white flex items-center gap-2">
+                        <Link to='/' className="absolute left-0 text-xl font-bold text-white flex items-center gap-2">
                             <img src="/logo.png" className="h-8"></img>
                             <span className="bg-main text-white px-2 py-1 rounded-lg text-xs">UAIC</span>
                         </Link>
 
+                        {/* Desktop Menu */}
                         <ul className="hidden md:flex lg:flex  gap-1 text-slate-400 text-sm font-medium cursor-pointer">
                             <NavLink
                                 to="/"
@@ -93,9 +94,10 @@ const Navbar = () => {
                                     Clasament
                             </NavLink>
                         </ul>
-                            
+                        
+                            {/* Profile */}
                             {profile ? (
-                                <div className="relative">
+                                <div className="absolute right-0">
                                     <button onClick={() => setOpenProfile(!openProfile)} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-900 cursor-pointer">R</button>
                                     
                                     {openProfile && (
@@ -104,8 +106,8 @@ const Navbar = () => {
                                                 <span className="text-xs font-bold text-slate-400">Lvl {profile.level}</span>
                                                 <span className="text-sm font-bold text-blue-400 font-mono">{profile.xp} XP</span>
                                             </div>
-                                            <a href="/profil" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Profil</a>
-                                            <a href="/setari" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Setări</a>
+                                            <Link to="/profil" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Profil</Link>
+                                            <Link to="/setari" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Setări</Link>
                                             <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 rounded transition">Logout</button>
                                     </div> )}
                                 </div>

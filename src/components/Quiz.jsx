@@ -123,7 +123,7 @@ export function Quiz({lesson, parent,  onComplete}) {
                         </div>
                     </div>
                     <div className="animate-fade-in">
-                        <h2 className="text-2xl md-text-3xl font-bold text-white mb-8 leading-tight">{currQuestion.question}</h2>
+                        <h2 className="text-xl md:text-2xl md-text-3xl font-bold text-white mb-8 leading-tight">{currQuestion.question}</h2>
 
                         <div className="space-y-3">
                             {currQuestion.options.map((option, index) => (

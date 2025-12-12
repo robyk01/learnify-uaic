@@ -94,7 +94,7 @@ const Navbar = () => {
                                     Clasament
                             </NavLink>
                         </ul>
-                        
+
                             {/* Profile */}
                             {profile ? (
                                 <div className="absolute right-0">
@@ -130,32 +130,32 @@ const Navbar = () => {
             )}
 
             {/* Mobile Menu Bottom */}
-            <div className="w-full fixed bottom-0 bg-slate-900 rounded-t-3xl border-t border-slate-600 z-10">
-                <ul className=" flex justify-around md:hidden lg:hidden list-none gap-1 text-slate-400 text-sm font-medium cursor-pointer">
+            <div className="w-full fixed bottom-0 bg-slate-900/50 glass-nav rounded-t-3xl border-t border-slate-600 z-10">
+                <ul className=" flex justify-around md:hidden lg:hidden list-none gap-1 text-slate-400 text-xs font-medium cursor-pointer">
                         <NavLink
                             to="/"
-                            className={({ isActive }) => `p-6 ${isActive ? "text-white" : ""}`}>
+                            className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
                             <div className="flex flex-col items-center gap-1">
-                                <Home className="h-6 w-6" />
+                                <Home className="h-5 w-5" />
                                 <span>Acasă</span>
                             </div>
                         </NavLink>
 
                         <NavLink
                             to="#"
-                            className={`relative p-6`}>
+                            className={`relative py-4`}>
                                 <div className="flex flex-col items-center gap-1">
-                                    <Code className="h-6 w-6" />
+                                    <Code className="h-5 w-5" />
                                     <span>Probleme</span>
                                 </div>
-                                <span className="absolute top-[15px] -right-2 bg-main text-[10px] text-gray-200 px-2 rounded-full z-0">Soon</span>
+                                <span className="absolute top-[10px] -right-5 bg-main text-[10px] text-gray-200 px-2 rounded-full z-0">Soon</span>
                         </NavLink>
 
                         <NavLink
                             to="/clasament"
-                            className={({ isActive }) => `p-6 ${isActive ? "text-white bg-slate-900" : "hover:bg-slate-900"}`}>
+                            className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
                                 <div className="flex flex-col items-center gap-1">
-                                    <Trophy className="h-6 w-6" />
+                                    <Trophy className="h-5 w-5" />
                                     <span>Clasament</span>
                                 </div>
                         </NavLink>

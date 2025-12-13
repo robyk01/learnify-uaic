@@ -98,7 +98,7 @@ const Navbar = () => {
                             {/* Profile */}
                             {profile ? (
                                 <div className="absolute right-0">
-                                    <button onClick={() => setOpenProfile(!openProfile)} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-900 cursor-pointer">R</button>
+                                    <button onClick={() => setOpenProfile(!openProfile)} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-900 cursor-pointer">{profile?.username?.[0].toUpperCase()}</button>
                                     
                                     {openProfile && (
                                         <div className="absolute flex flex-col gap-2 right-0 mt-4 px-2 w-48 py-4 bg-slate-900 rounded-xl border border-slate-800 animate-in fade-in zoom-in-95 duration-200">

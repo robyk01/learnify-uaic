@@ -6,7 +6,12 @@
 
 body {
   @apply bg-slate-950 text-slate-200; 
-  padding-bottom: 100px;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 100px;
+  }
 }
 
 html {
@@ -18,3 +23,24 @@ html {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px); 
 }
+
+.gutter {
+    background-color: #1e293b; 
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+    width: 3px !important;
+    cursor: col-resize;
+}
+
+.gutter.gutter-vertical {
+    height: 3px !important;
+    cursor: row-resize;
+}
+
+.gutter:hover {
+    background-color: #3b82f6;
+}
+

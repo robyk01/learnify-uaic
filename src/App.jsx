@@ -7,6 +7,8 @@ import LoginPage from "./pages/LoginPage";
 import Leaderboard from "./pages/Leaderboard";
 import { FeedbackBtn } from "./components/Feedback";
 import Profile from "./pages/Profile";
+import ProblemList from "./pages/ProblemList";
+import ProblemPage from "./pages/ProblemPage";
 
 function App() {
   return(
@@ -17,8 +19,13 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/modul/:slug" element={<ModulePage />} />
         <Route path="/lectie/:slug" element={<LessonPage />} />
+
+        <Route path="/probleme" element={<ProblemList />} />
+        <Route path="/probleme/:slug" element={<ProblemPage />} />
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/clasament" element={<Leaderboard />} />
+
         <Route path="/profil" element={<Profile />} />
 
         <Route path="*" element={<div className="text-white p-10">404 - Pagina nu a fost gasita!</div>} />

@@ -54,22 +54,23 @@ const ModulePage = () => {
 
                 <div className="space-y-3">
                     {module.lessons.map((lesson) => (
-                        <Link 
-                            key={lesson.id}
-                            to={`/lectie/${lesson.slug}`}
-                            className=" bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
-                                <div className="flex items-center gap-3">
-                                    <p className="text-xl">
-                                        {lesson.lesson_type === 'theory' ? '📖' : 
-                                         lesson.lesson_type === 'quiz' ? '🧩' : '💻'}
-                                    </p>
-                                    <p className="font-medium">{lesson.title}</p>
-                                </div>
-                                <span className="text-slate-500 text-sm">
-                                    {lesson.xp_reward} XP
-                                </span>
-                        </Link>
-                        
+                        lesson.lesson_type !== 'code' && (
+                            <Link 
+                                key={lesson.id}
+                                to={`/lectie/${lesson.slug}`}
+                                className=" bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
+                                    <div className="flex items-center gap-3">
+                                        <p className="text-xl">
+                                            {lesson.lesson_type === 'theory' ? '📖' : 
+                                            lesson.lesson_type === 'quiz' ? '🧩' : '💻'}
+                                        </p>
+                                        <p className="font-medium">{lesson.title}</p>
+                                    </div>
+                                    <span className="text-slate-500 text-sm">
+                                        {lesson.xp_reward} XP
+                                    </span>
+                            </Link>
+                        )
                     ))}
                 </div>
             </div>

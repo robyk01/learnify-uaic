@@ -107,7 +107,7 @@ const Navbar = () => {
                                                 <span className="text-sm font-bold text-blue-400 font-mono">{profile.xp} XP</span>
                                             </div>
                                             <Link to="/profil" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Profil</Link>
-                                            <Link to="/setari" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Setări</Link>
+                                            {/* <Link to="/setari" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Setări</Link> */}
                                             <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 rounded transition">Logout</button>
                                     </div> )}
                                 </div>

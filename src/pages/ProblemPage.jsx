@@ -47,7 +47,7 @@ const ProblemPage = () => {
             inherit: true,
             rules: [],
             colors: {
-                'editor.background': '#0f172a', 
+                'editor.background': '#020617', 
                 'editor.lineHighlightBackground': '#1e293b',
             }
         })
@@ -225,7 +225,7 @@ const ProblemPage = () => {
                             </div>
 
                             {/* Console */}
-                            <div className="flex flex-col min-h-0 border-t border-slate-800 bg-slate-900">
+                            <div className="flex flex-col min-h-0 border-t border-slate-800 bg-slate-950">
 
                                 <div className="h-8 bg-slate-900 border-b border-slate-800 flex items-center px-4">
                                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Consolă / Output</span>

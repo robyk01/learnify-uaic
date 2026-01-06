@@ -82,10 +82,10 @@ const Navbar = () => {
                             </NavLink>
 
                             <NavLink
-                                to="#"
-                                className="relative px-3 py-3 rounded transition-all cursor-not-allowed group z-10">
+                                to="/probleme"
+                                className={({ isActive }) => `relative px-3 py-3 rounded transition-all z-10 ${isActive ? "text-white bg-slate-900" : "hover:bg-slate-900"}`}>
                                     Probleme
-                                    <span className="absolute top-0 -right-3 bg-main text-[10px] text-gray-200 px-2 rounded-full z-0">Soon</span>
+                                    <span className="absolute top-0 -right-3 bg-main text-[10px] text-gray-200 px-2 rounded-full z-0">Nou</span>
                             </NavLink>
 
                             <NavLink
@@ -148,7 +148,7 @@ const Navbar = () => {
                                     <Code className="h-5 w-5" />
                                     <span>Probleme</span>
                                 </div>
-                                <span className="absolute top-[10px] -right-5 bg-main text-[10px] text-gray-200 px-2 rounded-full z-0">Soon</span>
+                                <span className="absolute top-[10px] -right-5 bg-main text-[10px] text-gray-200 px-2 rounded-full z-0">Nou</span>
                         </NavLink>
 
                         <NavLink

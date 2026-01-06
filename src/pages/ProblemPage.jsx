@@ -20,6 +20,12 @@ const ProblemPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitStatus, setSubmitStatus] = useState(null)
 
+    const [submitHistory, setSubmitHistory] = useState([])
+    const [historyLoading, setHistoryLoading] = useState(false)
+    const [selectedSubmission, setSelectedSubmission] = useState(null)
+
+    const [leftTab, setLeftTab] = useState('descriere')
+
     const {slug} = useParams();
 
     useEffect(() =>  {
@@ -39,6 +45,7 @@ const ProblemPage = () => {
             if (problemData){
                 setProblem(problemData)
                 setUserCode(problemData?.starter_code || "// Scrie rezolvarea aici...")
+                loadSubmitHistory(problemData?.lessons?.id)
                 setLoading(false)
             }
         }
@@ -56,6 +63,36 @@ const ProblemPage = () => {
                 'editor.lineHighlightBackground': '#1e293b',
             }
         })
+    }
+
+    const loadSubmitHistory = async (lessonId) => {
+        setHistoryLoading(true)
+
+        try {
+            const {data: authData, error: authError} = await supabase.auth.getUser()
+            if (authError || !lessonId || !authData?.user) {
+                setSubmitHistory([])
+                return
+            }
+
+            const {data, error} = await supabase
+            .from('submissions')
+            .select('id, verdict, passed, total, created_at, language, code')
+            .eq('user_id', authData.user.id)
+            .eq('lesson_id', lessonId)
+            .order('created_at', {ascending: false})
+            .limit(10)
+
+            if (error){
+                console.error('Error loading submissions:', error)
+                setSubmitHistory([])
+                return
+            }
+
+            setSubmitHistory(data || [])
+        } finally {
+            setHistoryLoading(false)
+        }
     }
 
     const runCases = async ( {includeHidden} ) => {
@@ -143,17 +180,41 @@ const ProblemPage = () => {
 
             const allPassed = results.length > 0 && results.every(r => r.ok)
 
-            if (!allPassed){
-                setSubmitStatus({ ok: false, message: "Unele teste au picat. Încearcă din nou."})
-                return
-            }
-
             const lessonId = problem?.lessons?.id
             if (!lessonId) {
                 setSubmitStatus({ ok: false, message: "Lipsește lesson id pentru această problemă." })
                 return
             }
+
+            const passed = results.filter(r => r.ok).length
+            const total = results.length
+
+            const hasRuntime = results.some(r => !!r.error)
+            const verdict = allPassed ? 'accepted'
+                            : hasRuntime ? 'runtime_error'
+                            : 'wrong_answer'
+
+            const {error: insertSubError} = await supabase
+            .from('submissions')
+            .insert({
+                user_id: authData.user.id,
+                lesson_id: lessonId,
+                language: problem?.language || 'cpp',
+                code: userCode,
+                passed,
+                total,
+                verdict,
+            })
             
+            if (insertSubError) console.error('Insert submission failed: ', insertSubError)
+            await loadSubmitHistory(lessonId)
+
+            if (!allPassed){
+                setSubmitStatus({ ok: false, message: "Unele teste au picat. Încearcă din nou."})
+                return
+            }
+
+
             const {data: existingProgress, error: progressFetchError} = await supabase
             .from('user_progress')
             .select('id, is_completed')
@@ -191,6 +252,7 @@ const ProblemPage = () => {
             } else {
                 setSubmitStatus({ ok: true, message: "Corect! Toate testele trecute." })
             }
+
         } finally {
             setIsSubmitting(false)
         }
@@ -268,41 +330,136 @@ const ProblemPage = () => {
                 snapOffset={30}>
                     
                     {/* Left panel */}
-                    <div className="overflow-y-auto h-full p-6 bg-slate-950 custom-scrollbar">
-                        <div className="prose prose-invert max-w-none pb-10">
-                            <ReactMarkdown>
-                                {problem.description}
-                            </ReactMarkdown>
+                    <div className="h-full bg-slate-950 flex flex-col overflow-hidden">
+
+                        {/* Tabs */}
+                        <div className="shrink-0 border-b border-slate-800 bg-slate-900/40 px-3 py-2">
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setLeftTab('descriere')}
+                                    className={`px-3 py-1.5 text-sm rounded-md border transition-all
+                                        ${leftTab === 'descriere' 
+                                            ? 'bg-slate-800 border-slate-700 text-white' 
+                                            : 'bg-transparent border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900'}
+                                        `}
+                                    > Descriere 
+                                </button>
+                                <button
+                                    onClick={() => setLeftTab('istoric')}
+                                    className={`px-3 py-1.5 text-sm rounded-md border transition-all
+                                        ${leftTab === 'istoric' 
+                                            ? 'bg-slate-800 border-slate-700 text-white' 
+                                            : 'bg-transparent border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900'}
+                                        `}
+                                    > Istoric 
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Test cases */}
-                        {publicTests.length > 0 && (
-                            <div className="flex flex-col gap-8 pb-10">
-                                <h3 className="text-lg font-bold text-white">Exemple</h3>
-
-                                {publicTests.map((test, index) => (
-                                    <div key={index} className="flex flex-col gap-2">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-slate-500 font-mono uppercase">Intrare/Input</span>
-                                                <pre className="bg-slate-900 border border-slate-800 text-slate-300 p-3 rounded-lg font-mono text-sm overflow-x-auto">
-                                                    {test.input}
-                                                </pre>
-                                            </div>
-
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-slate-500 font-mono uppercase">Ieșire/Output</span>
-                                                <pre className="bg-slate-900 border border-slate-800 text-slate-300 p-3 rounded-lg font-mono text-sm overflow-x-auto">
-                                                    {test.expected_output}
-                                                </pre>
-                                            </div>
-                                        </div>
+                        {/* Tab Content */}
+                        <div className="flex-1 min-h-0 overflow-y-auto p-6 bg-slate-950 custom-scrollbar">
+                            {leftTab === 'descriere' ? (
+                                <>
+                                    <div className="prose prose-invert max-w-none pb-10">
+                                        <ReactMarkdown>
+                                            {problem.description}
+                                        </ReactMarkdown>
                                     </div>
-                                ))}
-                            </div>
-                        )}
+
+                                    {/* Test cases */}
+                                    {publicTests.length > 0 && (
+                                        <div className="flex flex-col gap-8 pb-10">
+                                            <h3 className="text-lg font-bold text-white">Exemple</h3>
+
+                                            {publicTests.map((test, index) => (
+                                                <div key={index} className="flex flex-col gap-2">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-xs text-slate-500 font-mono uppercase">Intrare/Input</span>
+                                                            <pre className="bg-slate-900 border border-slate-800 text-slate-300 p-3 rounded-lg font-mono text-sm overflow-x-auto">
+                                                                {test.input}
+                                                            </pre>
+                                                        </div>
+
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-xs text-slate-500 font-mono uppercase">Ieșire/Output</span>
+                                                            <pre className="bg-slate-900 border border-slate-800 text-slate-300 p-3 rounded-lg font-mono text-sm overflow-x-auto">
+                                                                {test.expected_output}
+                                                            </pre>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-lg font-bold text-white">Istoric soluții</h3>
+                                        <button
+                                            onClick={() => loadSubmitHistory(problem?.lessons?.id)}
+                                            disabled={historyLoading}
+                                            className="px-3 py-1.5 text-xs rounded-md border border-slate-700 bg-slate-900 hover:bg-slate-800 disabled:opacity-60"
+                                        >
+                                            {historyLoading ? "Se încarcă..." : "Reîncarcă"}
+                                        </button>
+                                    </div>
+
+                                    {selectedSubmission && (
+                                        <div className="text-xs text-slate-400">
+                                            Ai încărcat soluția din:{" "}
+                                            <span className="font-mono">{new Date(selectedSubmission.created_at).toLocaleString()}</span>
+                                        </div>
+                                    )}
+
+                                    {historyLoading ? (
+                                        <div className="text-sm text-slate-400 font-mono">Se încarcă istoricul...</div>
+                                    ) : submitHistory.length === 0 ? (
+                                        <div className="text-sm text-slate-400">Nu ai soluții încă..</div>
+                                    ) : (
+                                        <div className="flex flex-col gap-2">
+                                            {submitHistory.map((s) => (
+                                                <button
+                                                    key={s.id} 
+                                                    className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/40 px-3 py-2 hover:bg-slate-800/40 hover:border-slate-700 transition-all"
+                                                    onClick={() => {
+                                                        setSelectedSubmission(s)
+                                                        setUserCode(s.code || "")
+                                                    }}
+                                                    title="Click pentru a încărca soluția în editor">
+                                                    <div className="flex items-center gap-2">
+                                                        <span
+                                                            className={`text-[11px] font-bold px-2 py-0.5 rounded
+                                                                ${s.verdict === 'accepted' 
+                                                                ? 'bg-green-900/40 text-green-300'
+                                                                : 'bg-red-900/40 text-red-300'}`}>
+                                                                    {s.verdict === 'accepted' ? 'CORECT' : 'GREȘIT'}
+                                                        </span>
+
+                                                        <span className="text-xs text-slate-300 font-mono">
+                                                            {s.passed} / {s.total}
+                                                        </span>
+
+                                                        <span className="text-xs text-slate-300 font-mono">
+                                                            {s.language}
+                                                        </span>
+                                                    </div>
+
+                                                    <span className="text-xs text-slate-500 font-mono">
+                                                        {new Date(s.created_at).toLocaleString()}
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
+
+                    
 
                     {/* Right panel */}
                     <div className="h-full bg-slate-900 border-l border-slate-800 overflow-hidden">

@@ -281,7 +281,7 @@ const ProblemPage = () => {
     }
 
     return(
-         <div className='h-[93vh] bg-slate-950 text-slate-200 font-sans flex flex-col overflow-hidden'>
+         <div className='md:h-[93vh] bg-slate-950 text-slate-200 font-sans flex flex-col md:overflow-hidden overflow-y-auto'>
 
             {/* Header */}
             <div className="min-h-16 border-b border-slate-800 flex flex-col md:flex-row items-center md:justify-between px-4 md:px-6 py-3 md:py-0 gap-3 md:gap-0 bg-slate-900 shrink-0">
@@ -295,7 +295,7 @@ const ProblemPage = () => {
                 </div>
 
                 {/* Right: Run & Submit */}
-                <div className="flex gap-4">
+                <div className="md:flex gap-4 hidden">
                     <button 
                         className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded border border-slate-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                         onClick={handleRun}
@@ -321,10 +321,10 @@ const ProblemPage = () => {
             )}
 
             {/* Mobile Panel no split */}
-            <div className="flex-1 flex flex-col overflow-hidden md:hidden">
+            <div className="md:hidden">
                 {/* Left panel */}
-                <div className="h-[100%] min-h-0 bg-slate-950 flex flex-col overflow-hidden border-b border-slate-800">
-                    <div className="h-full bg-slate-950 flex flex-col overflow-hidden">
+                <div className="min-h-0 bg-slate-950 flex flex-col border-b border-slate-800">
+                    <div className="h-full bg-slate-950 flex flex-col">
 
                         {/* Tabs */}
                         <div className="shrink-0 border-b border-slate-800 bg-slate-900/40 px-3 py-2">
@@ -351,7 +351,7 @@ const ProblemPage = () => {
                         </div>
 
                         {/* Tab Content */}
-                        <div className="flex-1 min-h-0 overflow-y-auto p-6 bg-slate-950 custom-scrollbar">
+                        <div className="flex-1 min-h-0 p-6 bg-slate-950">
                             {leftTab === 'descriere' ? (
                                 <>
                                     <div className="prose prose-invert max-w-none pb-10">
@@ -455,41 +455,55 @@ const ProblemPage = () => {
                 </div>
 
                 {/* Right panel */}
-                <div className="h-[100%] min-h-0 bg-slate-900 overflow-hidden">
-                     <div className="h-full bg-slate-900 border-l border-slate-800 overflow-hidden">
-                        <Split
-                            className="h-full flex flex-col overflow-hidden" 
-                            direction="vertical"
-                            sizes={[70, 30]} 
-                            minSize={100}
-                            gutterSize={10}
-                        >
+                <div className="bg-slate-900">
+                     <div className="h-full min-h-0 bg-slate-900 border-slate-800">
                             
                             {/* Editor */}
-                            <div className="overflow-hidden flex flex-col h-full ">
+                            <div className="flex flex-col h-full ">
                                 <div className="h-8 bg-slate-900 border-b border-slate-800 flex items-center px-4 shrink-0">
                                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cod</span>
                                 </div>
 
-                                <Editor
-                                    height="100%"
-                                    theme="my-theme"
-                                    language={problem?.language || 'cpp'}
-                                    value={userCode}
-                                    onChange={(value) => setUserCode(value)}
-                                    beforeMount={handleTheme}
-                                    options={{
-                                        minimap: {enabled: false},
-                                        fontSize: 14,
-                                        scrollBeyondLastLine: false,
-                                        automaticLayout: true,
-                                        padding: {top: 16}
-                                    }}
-                                />
+                                <div className="h-[55vh] mb-4 flex flex-col items-center">
+                                    <Editor
+                                        height="100%"
+                                        theme="my-theme"
+                                        language={problem?.language || 'cpp'}
+                                        value={userCode}
+                                        onChange={(value) => setUserCode(value)}
+                                        beforeMount={handleTheme}
+                                        options={{
+                                            minimap: {enabled: false},
+                                            fontSize: 14,
+                                            scrollBeyondLastLine: false,
+                                            automaticLayout: true,
+                                            padding: {top: 16}
+                                        }}
+                                    />
+                                    {/* Right: Run & Submit */}
+                                    <div className="md:hidden gap-4 flex justify-end mt-1">
+                                        <button 
+                                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded border border-slate-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                                            onClick={handleRun}
+                                            disabled={isRunning || isSubmitting}
+                                        >
+                                            {isRunning ? "Rulează.." : "Testează"} 
+                                        </button>
+                                        <button 
+                                            className="px-6 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded shadow-lg shadow-green-900/20 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                                            onClick={handleSubmit}
+                                            disabled={isSubmitting || isRunning}
+                                        >
+                                            {isSubmitting ? "Se trimite..." : "Trimite"}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                
                             </div>
 
                             {/* Console */}
-                            <div className="flex flex-col min-h-0 border-t border-slate-800 bg-slate-950">
+                            <div className="flex flex-col min-h-0 h-[35vh] border-t border-slate-800 bg-slate-950">
 
                                 <div className="h-8 bg-slate-900 border-b border-slate-800 flex items-center px-4 justify-between">
                                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Consolă / Output</span>
@@ -566,8 +580,6 @@ const ProblemPage = () => {
                                     )}
                                 </div>
                             </div>
-
-                        </Split>
                     </div>
                 </div>
             </div>

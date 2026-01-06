@@ -20,7 +20,7 @@ export default function Profile(){
 
             const [profileResult, progressResult] = await Promise.all([
                 supabase.from('profiles').select('*').eq('id', user.id).single(),
-                supabase.from('user_progress').select('completed_at, lesson_id').eq('user_id', user.id)
+                supabase.from('user_progress').select('completed_at, lesson_id').eq('user_id', user.id).order('completed_at', { ascending: false})
             ]);
 
             const userData = profileResult.data;
@@ -41,7 +41,7 @@ export default function Profile(){
 
                 const {data: lessonData, error: lessonError} = await supabase
                 .from('lessons')
-                .select('id, title, slug')
+                .select('id, title, slug, lesson_type')
                 .in('id', lessonIds)
 
                 if (lessonData){
@@ -96,14 +96,18 @@ export default function Profile(){
                         <p className="text-slate-500 italic">Nu ai terminat nicio lecție încă. Spor la treabă!</p>
                     ) : (
                         <div className="flex flex-col gap-4">
-                            {finishedLessons.map((item, index) => (
+                            {finishedLessons.map((item, index) => {
+                                const isCode = item?.lessons?.lesson_type === 'code'
+                                const to = isCode ? `/probleme/${item?.lessons?.slug}` : `/lectie/${item?.lessons?.slug}`
+                                return(
                                 <Link 
-                                    to={`/lectie/${item?.lessons?.slug}`}
+                                    to={to}
                                     key={index}
                                     className="py-3 px-4 border border-slate-700 rounded-xl transition-all hover:border-slate-600 hover:bg-slate-800/50">
                                         {item?.lessons?.title}
                                 </Link>
-                            ))}
+                                )
+                            })}
                         </div>
                     )}
                 </main>

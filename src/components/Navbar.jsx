@@ -142,7 +142,7 @@ const Navbar = () => {
                         </NavLink>
 
                         <NavLink
-                            to="#"
+                            to="/probleme"
                             className={`relative py-4`}>
                                 <div className="flex flex-col items-center gap-1">
                                     <Code className="h-5 w-5" />

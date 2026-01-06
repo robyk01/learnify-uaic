@@ -284,7 +284,7 @@ const ProblemPage = () => {
          <div className='h-[93vh] bg-slate-950 text-slate-200 font-sans flex flex-col overflow-hidden'>
 
             {/* Header */}
-            <div className="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900 shrink-0">
+            <div className="min-h-16 border-b border-slate-800 flex flex-col md:flex-row items-center md:justify-between px-4 md:px-6 py-3 md:py-0 gap-3 md:gap-0 bg-slate-900 shrink-0">
             
                 {/* Left: Title */}
                 <div className="flex items-center gap-4">
@@ -295,7 +295,7 @@ const ProblemPage = () => {
                 </div>
 
                 {/* Right: Run & Submit */}
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                     <button 
                         className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded border border-slate-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                         onClick={handleRun}
@@ -320,10 +320,262 @@ const ProblemPage = () => {
                     </div>
             )}
 
-            {/* Split screen */}
+            {/* Mobile Panel no split */}
+            <div className="flex-1 flex flex-col overflow-hidden md:hidden">
+                {/* Left panel */}
+                <div className="h-[100%] min-h-0 bg-slate-950 flex flex-col overflow-hidden border-b border-slate-800">
+                    <div className="h-full bg-slate-950 flex flex-col overflow-hidden">
+
+                        {/* Tabs */}
+                        <div className="shrink-0 border-b border-slate-800 bg-slate-900/40 px-3 py-2">
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setLeftTab('descriere')}
+                                    className={`px-3 py-1.5 text-sm rounded-md border transition-all
+                                        ${leftTab === 'descriere' 
+                                            ? 'bg-slate-800 border-slate-700 text-white' 
+                                            : 'bg-transparent border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900'}
+                                        `}
+                                    > Descriere 
+                                </button>
+                                <button
+                                    onClick={() => setLeftTab('istoric')}
+                                    className={`px-3 py-1.5 text-sm rounded-md border transition-all
+                                        ${leftTab === 'istoric' 
+                                            ? 'bg-slate-800 border-slate-700 text-white' 
+                                            : 'bg-transparent border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900'}
+                                        `}
+                                    > Istoric 
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Tab Content */}
+                        <div className="flex-1 min-h-0 overflow-y-auto p-6 bg-slate-950 custom-scrollbar">
+                            {leftTab === 'descriere' ? (
+                                <>
+                                    <div className="prose prose-invert max-w-none pb-10">
+                                        <ReactMarkdown>
+                                            {problem.description}
+                                        </ReactMarkdown>
+                                    </div>
+
+                                    {/* Test cases */}
+                                    {publicTests.length > 0 && (
+                                        <div className="flex flex-col gap-8 pb-10">
+                                            <h3 className="text-lg font-bold text-white">Exemple</h3>
+
+                                            {publicTests.map((test, index) => (
+                                                <div key={index} className="flex flex-col gap-2">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-xs text-slate-500 font-mono uppercase">Intrare/Input</span>
+                                                            <pre className="bg-slate-900 border border-slate-800 text-slate-300 p-3 rounded-lg font-mono text-sm overflow-x-auto">
+                                                                {test.input}
+                                                            </pre>
+                                                        </div>
+
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-xs text-slate-500 font-mono uppercase">Ieșire/Output</span>
+                                                            <pre className="bg-slate-900 border border-slate-800 text-slate-300 p-3 rounded-lg font-mono text-sm overflow-x-auto">
+                                                                {test.expected_output}
+                                                            </pre>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-lg font-bold text-white">Istoric soluții</h3>
+                                        <button
+                                            onClick={() => loadSubmitHistory(problem?.lessons?.id)}
+                                            disabled={historyLoading}
+                                            className="px-3 py-1.5 text-xs rounded-md border border-slate-700 bg-slate-900 hover:bg-slate-800 disabled:opacity-60"
+                                        >
+                                            {historyLoading ? "Se încarcă..." : "Reîncarcă"}
+                                        </button>
+                                    </div>
+
+                                    {selectedSubmission && (
+                                        <div className="text-xs text-slate-400">
+                                            Ai încărcat soluția din:{" "}
+                                            <span className="font-mono">{new Date(selectedSubmission.created_at).toLocaleString()}</span>
+                                        </div>
+                                    )}
+
+                                    {historyLoading ? (
+                                        <div className="text-sm text-slate-400 font-mono">Se încarcă istoricul...</div>
+                                    ) : submitHistory.length === 0 ? (
+                                        <div className="text-sm text-slate-400">Nu ai soluții încă..</div>
+                                    ) : (
+                                        <div className="flex flex-col gap-2">
+                                            {submitHistory.map((s) => (
+                                                <button
+                                                    key={s.id} 
+                                                    className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/40 px-3 py-2 hover:bg-slate-800/40 hover:border-slate-700 transition-all"
+                                                    onClick={() => {
+                                                        setSelectedSubmission(s)
+                                                        setUserCode(s.code || "")
+                                                    }}
+                                                    title="Click pentru a încărca soluția în editor">
+                                                    <div className="flex items-center gap-2">
+                                                        <span
+                                                            className={`text-[11px] font-bold px-2 py-0.5 rounded
+                                                                ${s.verdict === 'accepted' 
+                                                                ? 'bg-green-900/40 text-green-300'
+                                                                : 'bg-red-900/40 text-red-300'}`}>
+                                                                    {s.verdict === 'accepted' ? 'CORECT' : 'GREȘIT'}
+                                                        </span>
+
+                                                        <span className="text-xs text-slate-300 font-mono">
+                                                            {s.passed} / {s.total}
+                                                        </span>
+
+                                                        <span className="text-xs text-slate-300 font-mono">
+                                                            {s.language}
+                                                        </span>
+                                                    </div>
+
+                                                    <span className="text-xs text-slate-500 font-mono">
+                                                        {new Date(s.created_at).toLocaleString()}
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right panel */}
+                <div className="h-[100%] min-h-0 bg-slate-900 overflow-hidden">
+                     <div className="h-full bg-slate-900 border-l border-slate-800 overflow-hidden">
+                        <Split
+                            className="h-full flex flex-col overflow-hidden" 
+                            direction="vertical"
+                            sizes={[70, 30]} 
+                            minSize={100}
+                            gutterSize={10}
+                        >
+                            
+                            {/* Editor */}
+                            <div className="overflow-hidden flex flex-col h-full ">
+                                <div className="h-8 bg-slate-900 border-b border-slate-800 flex items-center px-4 shrink-0">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cod</span>
+                                </div>
+
+                                <Editor
+                                    height="100%"
+                                    theme="my-theme"
+                                    language={problem?.language || 'cpp'}
+                                    value={userCode}
+                                    onChange={(value) => setUserCode(value)}
+                                    beforeMount={handleTheme}
+                                    options={{
+                                        minimap: {enabled: false},
+                                        fontSize: 14,
+                                        scrollBeyondLastLine: false,
+                                        automaticLayout: true,
+                                        padding: {top: 16}
+                                    }}
+                                />
+                            </div>
+
+                            {/* Console */}
+                            <div className="flex flex-col min-h-0 border-t border-slate-800 bg-slate-950">
+
+                                <div className="h-8 bg-slate-900 border-b border-slate-800 flex items-center px-4 justify-between">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Consolă / Output</span>
+
+                                    {runResults.length > 0 && (
+                                        <span className="text-xs font-mono text-slate-400">
+                                            {runResults.filter(r => r.ok).length} / {runResults.length}
+                                        </span>
+                                    )}
+                                </div>
+                                
+                                <div className="flex-1 p-3 overflow-auto text-sm">
+                                    {(isRunning || isSubmitting) && runResults.length === 0 ? (
+                                        <div className="flex items-center gap-3 text-slate-300">
+                                            <div className="h-4 w-4 rounded-full border-2 border-slate-500 border-t-transparent animate-spin" />
+                                            <div className="font-mono text-sm">Se rulează testele..</div>
+                                        </div>
+                                    ) : runResults.length === 0 ? (
+                                        <pre className="font-mono text-slate-300 whitespace-pre-wrap">Rezultatele vor apărea aici</pre>
+                                    ) : (
+                                        <div className="flex flex-col gap-2">
+                                            {runResults.map((r) => (
+                                                <div 
+                                                className={`rounded-lg border px-3 py-2 
+                                                    ${r.ok ?  "border-green-900/60 bg-green-950/40" : "border-red-900/60 bg-red-950/30"}`}
+                                                key={r.index}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`text-[11px] font-bold px-2 py-0.5 rounded
+                                                            ${r.ok ? "bg-green-900/40 text-green-300" : "bg-red-900/60 text-red-300"}`}>
+                                                                {r.ok ? "CORECT" : "GRESIT"}
+                                                            </span>
+                                                            <span className="text-slate-200 font-semibold">
+                                                                Test #{r.index}
+                                                            </span>
+                                                        </div>
+
+                                                        {r.error && (
+                                                            <span className="text-xs text-red-300 font-mono">
+                                                                EROARE
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {!r.ok && (
+                                                        <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2 font-mono text-xs">
+                                                            <div className="rounded border border-slate-800 bg-slate-900/60 p-2">
+                                                                <div className="text-slate-500 mb-1">Rezultat așteptat:</div>
+                                                                <pre className="whitespace-pre-wrap text-slate-200">
+                                                                    {String(r.expected ?? "").trim()}
+                                                                </pre>
+                                                            </div>
+                                                            <div className="rounded border border-slate-800 bg-slate-900/60 p-2">
+                                                                <div className="text-slate-500 mb-1">Rezultat primit:</div>
+                                                                <pre className="whitespace-pre-wrap text-slate-200">
+                                                                    {String(r.got ?? "").trim()}
+                                                                </pre>
+                                                            </div>
+
+                                                            {r.error && (
+                                                                <div className="lg:col-span-2 rounded border border-slate-800 bg-slate-900/60 p-2">
+                                                                    <div className="text-slate-500 mb-1">Eroare</div>
+                                                                    <pre className="whitespace-pre-wrap text-red-200">
+                                                                        {r.error}
+                                                                    </pre>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                        </Split>
+                    </div>
+                </div>
+            </div>
+            
+            {/* Split screen dekstop */}
             <Split
-                className="flex-1 flex flex-row overflow-hidden"
-                direction="horizontal"
+                className="flex-1 hidden md:flex flex-col md:flex-row overflow-hidden"
+                direction='horizontal'
                 sizes={[40, 60]}
                 minSize={300}
                 gutterSize={10}

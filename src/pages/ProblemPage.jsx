@@ -6,14 +6,19 @@ import Split from "react-split";
 import ReactMarkdown from "react-markdown"
 import { Editor } from "@monaco-editor/react";
 
-import { executeCode } from "../utils/pistol";
+import { executeCode } from "../utils/piston";
+import confetti from "canvas-confetti";
 
 const ProblemPage = () => {
     const [problem, setProblem] = useState(null)
     const [loading, setLoading] = useState(true)
     const [userCode, setUserCode] = useState("")
 
-    const [consoleOutput, setConsoleOutput] = useState("// Aici va apărea rezultatul...")
+    const [runResults, setRunResults] = useState([])
+    const [isRunning, setIsRunning] = useState(false)
+
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [submitStatus, setSubmitStatus] = useState(null)
 
     const {slug} = useParams();
 
@@ -53,54 +58,153 @@ const ProblemPage = () => {
         })
     }
 
-    const handleRun = async () => {
-        setConsoleOutput("Se compilează și se rulează testele...\n----------------------------------");
+    const runCases = async ( {includeHidden} ) => {
+        const tests = includeHidden ? (problem?.test_cases || []) : (problem?.test_cases?.filter((t) => t.is_public) || [])
 
-        const testInput = problem?.test_cases?.filter(t => t.is_public);
-        let report = "";
-        let allPassed = true;
+        const results = []
 
-        for (let i = 0; i < testInput.length; i++){
-            const test = testInput[i];
+        for (let i = 0; i < tests.length; i++){
+            const test = tests[i]
 
             try {
-                const result = await executeCode(problem.language, userCode, test.input);
+                const result = await executeCode(problem.language || 'cpp', userCode, test.input);
 
-                if (result.error){
-                    report += `\nTest ${i + 1}: EROARE API (${result.error})`;
-                    allPassed = false;
+                if (result?.error){
+                    results.push({
+                        index: i + 1,
+                        ok: false,
+                        input: test.input,
+                        expected: test.expected_output,
+                        got: "",
+                        error: String(result.error),
+                    })
                     continue;
                 }
 
-                const userOutput = result.run.output ? result.run.output.trim() : "";
-                const expectedOutput = test.expected_output.trim();
+                const userOutput = result?.run?.output ? result.run.output.trim() : "";
+                const expectedOutput = (test.expected_output || "").trim();
 
-                if (userOutput == expectedOutput){
-                    report += `\nTest ${i + 1}:  Trecut.`;
-                } else {
-                    allPassed = false;
-                    report += `\nTest ${i + 1}: Greșit`;
-                    report += `\n   Input:    ${test.input.replace(/\n/g, ' ')}`;
-                    report += `\n   Așteptat: ${expectedOutput}`;
-                    report += `\n   Primit:   ${userOutput}\n`;
-                }
+                results.push({
+                    index: i + 1,
+                    ok: expectedOutput === userOutput,
+                    input: test.input,
+                    expected: test.expected_output,
+                    got: userOutput,
+                    error: null,
+                })
+
             } catch (err) {
-                report += `\nTest ${i + 1}: Eroare: (${err.message})`;
-                allPassed = false;
+                results.push({
+                    index: i + 1,
+                    ok: false,
+                    input: test.input,
+                    expected: test.expected_output,
+                    got: "",
+                    error: err?.message ? String(err.message): String(err),
+                })
             }
         }
 
-        report += "\n----------------------------------";
-        if (allPassed) {
-            report += "\n🎉 Felicitări! Toate testele publice au trecut.";
-        } else {
-            report += "\nUnele teste au picat. Corectează codul.";
-        }
+        return results
+    }
 
-        setConsoleOutput(report)
+    const handleRun = async () => {
+        if (isRunning || isSubmitting) return
+
+        setIsRunning(true)
+        setSubmitStatus(null)
+        setRunResults([])
+
+        try {
+            const results = await runCases({includeHidden: false})
+            setRunResults(results)
+        } finally {
+            setIsRunning(false)
+        }
+    }
+
+    const handleSubmit = async () => {
+        if (isRunning || isSubmitting) return
+
+        setIsSubmitting(true)
+        setSubmitStatus(null)
+        setRunResults([])
+
+        try {
+            const {data: authData, error: authError} = await supabase.auth.getUser()
+
+            if (authError || !authData?.user) {
+                setSubmitStatus({ ok: false, message: "Trebuie să fii autentificat ca să trimiți soluția." })
+                return
+            }
+
+            const results = await runCases({includeHidden: true})
+            setRunResults(results)
+
+            const allPassed = results.length > 0 && results.every(r => r.ok)
+
+            if (!allPassed){
+                setSubmitStatus({ ok: false, message: "Unele teste au picat. Încearcă din nou."})
+                return
+            }
+
+            const lessonId = problem?.lessons?.id
+            if (!lessonId) {
+                setSubmitStatus({ ok: false, message: "Lipsește lesson id pentru această problemă." })
+                return
+            }
+            
+            const {data: existingProgress, error: progressFetchError} = await supabase
+            .from('user_progress')
+            .select('id, is_completed')
+            .eq('user_id', authData.user.id)
+            .eq('lesson_id', lessonId)
+            .maybeSingle()
+
+            if (progressFetchError){
+                console.error(progressFetchError)
+                setSubmitStatus({ ok: false, message: "Eroare la citirea progresului." })
+                return
+            }
+
+            const alreadyCompleted = !!existingProgress?.is_completed
+
+            if (!alreadyCompleted){
+                const {error: upsertError} = await supabase
+                .from('user_progress')
+                .upsert({
+                    ...(existingProgress?.id ? {id: existingProgress.id} : {}),
+                    user_id: authData.user.id,
+                    lesson_id: lessonId,
+                    is_completed: true,
+                    completed_at: new Date().toISOString(),
+                }, { onConflict: "user_id,lesson_id" })
+
+                if (upsertError) {
+                    console.error(upsertError)
+                    setSubmitStatus({ ok: false, message: "Nu am putut salva progresul." })
+                    return
+                }
+
+                setSubmitStatus({ok: true, message: `Corect! Ai câștigat ${problem?.lessons?.xp_reward ?? 0} XP.` })
+                triggerConfetti()
+            } else {
+                setSubmitStatus({ ok: true, message: "Corect! Toate testele trecute." })
+            }
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const publicTests = problem?.test_cases?.filter(tc => tc.is_public) || [];
+
+    const triggerConfetti = () => {
+            confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+            })
+        }
 
     if (loading) {
         return (
@@ -119,7 +223,7 @@ const ProblemPage = () => {
 
             {/* Header */}
             <div className="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900 shrink-0">
-                
+            
                 {/* Left: Title */}
                 <div className="flex items-center gap-4">
                     <span className="font-bold text-white text-lg">{problem?.lessons?.title}</span>
@@ -131,19 +235,28 @@ const ProblemPage = () => {
                 {/* Right: Run & Submit */}
                 <div className="flex gap-3">
                     <button 
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded border border-slate-700 transition-all"
+                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded border border-slate-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                         onClick={handleRun}
+                        disabled={isRunning || isSubmitting}
                     >
-                        Testează 
+                        {isRunning ? "Rulează.." : "Testează"} 
                     </button>
                     <button 
-                        className="px-6 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded shadow-lg shadow-green-900/20 transition-all active:scale-95"
+                        className="px-6 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded shadow-lg shadow-green-900/20 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                        onClick={handleSubmit}
+                        disabled={isSubmitting || isRunning}
                     >
-                        Trimite
+                        {isSubmitting ? "Se trimite..." : "Trimite"}
                     </button>
                 </div>
             </div>
 
+            {submitStatus && (
+                <div className={`px-6 py-2 text-sm border-b border-slate-800 
+                    ${submitStatus.ok ? "bg-green-950/40 text-green-300" : "bg-red-950/30 text-red-300"}`}>
+                        {submitStatus.message}
+                    </div>
+            )}
 
             {/* Split screen */}
             <Split
@@ -227,13 +340,79 @@ const ProblemPage = () => {
                             {/* Console */}
                             <div className="flex flex-col min-h-0 border-t border-slate-800 bg-slate-950">
 
-                                <div className="h-8 bg-slate-900 border-b border-slate-800 flex items-center px-4">
+                                <div className="h-8 bg-slate-900 border-b border-slate-800 flex items-center px-4 justify-between">
                                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Consolă / Output</span>
+
+                                    {runResults.length > 0 && (
+                                        <span className="text-xs font-mono text-slate-400">
+                                            {runResults.filter(r => r.ok).length} / {runResults.length}
+                                        </span>
+                                    )}
                                 </div>
                                 
+                                <div className="flex-1 p-3 overflow-auto text-sm">
+                                    {(isRunning || isSubmitting) && runResults.length === 0 ? (
+                                        <div className="flex items-center gap-3 text-slate-300">
+                                            <div className="h-4 w-4 rounded-full border-2 border-slate-500 border-t-transparent animate-spin" />
+                                            <div className="font-mono text-sm">Se rulează testele..</div>
+                                        </div>
+                                    ) : runResults.length === 0 ? (
+                                        <pre className="font-mono text-slate-300 whitespace-pre-wrap">Rezultatele vor apărea aici</pre>
+                                    ) : (
+                                        <div className="flex flex-col gap-2">
+                                            {runResults.map((r) => (
+                                                <div 
+                                                className={`rounded-lg border px-3 py-2 
+                                                    ${r.ok ?  "border-green-900/60 bg-green-950/40" : "border-red-900/60 bg-red-950/30"}`}
+                                                key={r.index}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`text-[11px] font-bold px-2 py-0.5 rounded
+                                                            ${r.ok ? "bg-green-900/40 text-green-300" : "bg-red-900/60 text-red-300"}`}>
+                                                                {r.ok ? "CORECT" : "GRESIT"}
+                                                            </span>
+                                                            <span className="text-slate-200 font-semibold">
+                                                                Test #{r.index}
+                                                            </span>
+                                                        </div>
 
-                                <div className="flex-1 p-4 overflow-auto font-mono text-sm text-slate-300">
-                                    <pre>{consoleOutput}</pre>
+                                                        {r.error && (
+                                                            <span className="text-xs text-red-300 font-mono">
+                                                                EROARE
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {!r.ok && (
+                                                        <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-2 font-mono text-xs">
+                                                            <div className="rounded border border-slate-800 bg-slate-900/60 p-2">
+                                                                <div className="text-slate-500 mb-1">Rezultat așteptat:</div>
+                                                                <pre className="whitespace-pre-wrap text-slate-200">
+                                                                    {String(r.expected ?? "").trim()}
+                                                                </pre>
+                                                            </div>
+                                                            <div className="rounded border border-slate-800 bg-slate-900/60 p-2">
+                                                                <div className="text-slate-500 mb-1">Rezultat primit:</div>
+                                                                <pre className="whitespace-pre-wrap text-slate-200">
+                                                                    {String(r.got ?? "").trim()}
+                                                                </pre>
+                                                            </div>
+
+                                                            {r.error && (
+                                                                <div className="lg:col-span-2 rounded border border-slate-800 bg-slate-900/60 p-2">
+                                                                    <div className="text-slate-500 mb-1">Eroare</div>
+                                                                    <pre className="whitespace-pre-wrap text-red-200">
+                                                                        {r.error}
+                                                                    </pre>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

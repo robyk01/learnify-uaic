@@ -21,7 +21,12 @@ export function Quiz({lesson, parent, onComplete}) {
     const max_selections = Number(currQuestion?.max_selections || 1)
     const isMulti = max_selections > 1
 
-    const isSelected = (option) => (isMulti ? selectedOptions.includes(option) : selectedOption === option)
+    const optionKey = (o) => o.id;
+    const isSelected = (option) => (
+        isMulti 
+            ? selectedOptions.some(o => optionKey(o) === optionKey(option))
+            : selectedOption && optionKey(selectedOption) === optionKey(option)
+    )
 
     const handleOptionClick = (option) => {
         if (isChecking) return
@@ -32,11 +37,9 @@ export function Quiz({lesson, parent, onComplete}) {
         }
 
         setSelectedOptions(prev => {
-            const exists = prev.includes(option)
+            const exists = prev.some(o => optionKey(o) === optionKey(option))
 
-            if (exists) return prev.filter(o => o !== option)
-
-            if (prev.length >= max_selections) return prev
+            if (exists) return prev.filter(o => optionKey(o) !== optionKey(option))
 
             return [...prev, option]
         })
@@ -58,10 +61,14 @@ export function Quiz({lesson, parent, onComplete}) {
                     setScore(prevScore => prevScore + 1)
                 }
             } else {
-                const correctOptions = currQuestion.options.filter(o => o.is_correct)
+                const correctKeys = new Set(
+                    currQuestion.options.filter(o => o.is_correct).map(optionKey)
+                )
+                const selectedKeys = new Set(selectedOptions.map(optionKey))
+
                 const allCorrectChosen = 
-                    correctOptions.every(co => selectedOptions.includes(co)) &&
-                    selectedOptions.every(so => correctOptions.includes(so))
+                    correctKeys.size === selectedKeys.size &&
+                    [...correctKeys].every(k => selectedKeys.has(k))
 
                 if (allCorrectChosen){
                     setScore(prevScore => prevScore + 1)
@@ -82,10 +89,15 @@ export function Quiz({lesson, parent, onComplete}) {
             if (!isMulti){
                 add = selectedOption?.is_correct ? 1 : 0
             } else {
-                const correctOptions = currQuestion.options.filter(o => o.is_correct)
+                const correctKeys = new Set(
+                    currQuestion.options.filter(o => o.is_correct).map(optionKey)
+                )
+                const selectedKeys = new Set(selectedOptions.map(optionKey))
+
                 const allCorrectChosen =
-                    correctOptions.every(co => selectedOptions.includes(co)) &&
-                    selectedOptions.every(so => correctOptions.includes(so))
+                    correctKeys.size === selectedKeys.size &&
+                    [...correctKeys].every(k => selectedKeys.has(k))
+
                 add = allCorrectChosen ? 1 : 0
             }
 
@@ -188,7 +200,7 @@ export function Quiz({lesson, parent, onComplete}) {
                         <div className="space-y-3">
                             {currQuestion.options.map((option, index) => (
                                 <button
-                                    key={index}
+                                    key={option.id}
                                     onClick={() => handleOptionClick(option)}
                                     className={getOptionClasses(option)}>
 

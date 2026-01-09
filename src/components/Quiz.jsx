@@ -1,10 +1,11 @@
 import { useState } from "react";
-import confetti from "canvas-confetti";
 import { Link } from "react-router-dom";
+import ReactMarkdown from 'react-markdown'
 
-export function Quiz({lesson, parent,  onComplete}) {
+export function Quiz({lesson, parent, onComplete}) {
     const [currIndex, setCurrIndex] = useState(0)
     const [selectedOption, setSelectedOption] = useState(null)
+    const [selectedOptions, setSelectedOptions] = useState([])
     const [score, setScore] = useState(0)
     
     const [isChecking, setIsChecking] = useState(false)
@@ -17,33 +18,80 @@ export function Quiz({lesson, parent,  onComplete}) {
 
     const currQuestion = questions[currIndex]
 
+    const max_selections = Number(currQuestion?.max_selections || 1)
+    const isMulti = max_selections > 1
+
+    const isSelected = (option) => (isMulti ? selectedOptions.includes(option) : selectedOption === option)
+
     const handleOptionClick = (option) => {
         if (isChecking) return
 
-        setSelectedOption(option)
+        if (!isMulti){
+            setSelectedOption(option)
+            return
+        }
+
+        setSelectedOptions(prev => {
+            const exists = prev.includes(option)
+
+            if (exists) return prev.filter(o => o !== option)
+
+            if (prev.length >= max_selections) return prev
+
+            return [...prev, option]
+        })
     }
 
     const handleMainButton = () => {
         if (!isChecking){
-            if (!selectedOption) return
+            if (!isMulti){
+                if (!selectedOption) return
+            } else {
+                if (!selectedOptions || selectedOptions.length === 0)
+                    return
+            }
 
             setIsChecking(true)
 
-            if (selectedOption.is_correct){
-                setScore(prevScore => prevScore + 1)
+            if (!isMulti){
+                if (selectedOption?.is_correct){
+                    setScore(prevScore => prevScore + 1)
+                }
+            } else {
+                const correctOptions = currQuestion.options.filter(o => o.is_correct)
+                const allCorrectChosen = 
+                    correctOptions.every(co => selectedOptions.includes(co)) &&
+                    selectedOptions.every(so => correctOptions.includes(so))
+
+                if (allCorrectChosen){
+                    setScore(prevScore => prevScore + 1)
+                }
             }
-            return;
+
+            return
         }
 
         const nextIndex = currIndex + 1
         if (nextIndex < questions.length){
             setCurrIndex(nextIndex)
             setSelectedOption(null)
+            setSelectedOptions([])
             setIsChecking(false)
         } else {
+            let add = 0
+            if (!isMulti){
+                add = selectedOption?.is_correct ? 1 : 0
+            } else {
+                const correctOptions = currQuestion.options.filter(o => o.is_correct)
+                const allCorrectChosen =
+                    correctOptions.every(co => selectedOptions.includes(co)) &&
+                    selectedOptions.every(so => correctOptions.includes(so))
+                add = allCorrectChosen ? 1 : 0
+            }
+
             setIsFinished(true)
             if (!isCompleted) setIsCompleted(true)
-            onComplete(score)
+            onComplete(score + add)
         }
     }
 
@@ -54,13 +102,13 @@ export function Quiz({lesson, parent,  onComplete}) {
             if (option.is_correct){
                 return base + "border-green-500 bg-green-500/10 text-green-400"
             }
-            if (selectedOption === option && !option.is_correct){
+            if (isSelected(option) && !option.is_correct){
                 return base + "border-red-500 bg-red-500/10 text-red-400"
             }
             return base + "border-slate-800 text-slate-500 opacity-50"
         }
 
-        if (selectedOption === option){
+        if (isSelected(option)){
             return base + "border-blue-500 bg-blue-500/10 text-white shadow-[0_0_15px_rgba(59,130,246,0.3)] scale-[1.02]"
         }
 
@@ -68,6 +116,8 @@ export function Quiz({lesson, parent,  onComplete}) {
     }
 
     const progress = ((currIndex + 1) / questions.length) * 100;
+
+    const mainDisabled = !isChecking && (!isMulti ? !selectedOption : selectedOptions.length === 0)
 
     return(
         <div className="max-w-2xl mx-auto">
@@ -123,7 +173,17 @@ export function Quiz({lesson, parent,  onComplete}) {
                         </div>
                     </div>
                     <div className="animate-fade-in">
-                        <h2 className="text-xl md:text-2xl md-text-3xl font-bold text-white mb-8 leading-tight">{currQuestion.question}</h2>
+                        <div className="font-bold text-white mb-8 leading-tight prose prose-invert max-w-none">
+                            <ReactMarkdown components={{
+                                img: ({node, ...props}) => <img style={{maxWidth: '100%'}} {...props} className="rounded-lg mt-4 shadow-lg border border-slate-700" />
+                            }}>
+                                {currQuestion.question}
+                            </ReactMarkdown>
+                        </div>
+
+                        <div className="mb-4 text-xs text-slate-400 font-mono">
+                            {isMulti ? "Mai multe opțiuni corecte" : "O singură opțiune corectă"}
+                        </div>
 
                         <div className="space-y-3">
                             {currQuestion.options.map((option, index) => (
@@ -137,7 +197,7 @@ export function Quiz({lesson, parent,  onComplete}) {
                                 {isChecking && option.is_correct && (
                                     <span className="text-green-500 text-xl">✓</span>
                                 )}
-                                {isChecking && selectedOption === option && !option.is_correct && (
+                                {isChecking && isSelected(option) && !option.is_correct && (
                                     <span className="text-red-500 text-xl">✕</span>
                                 )}
                                 </button>
@@ -158,10 +218,10 @@ export function Quiz({lesson, parent,  onComplete}) {
 
                         <button
                             onClick={handleMainButton}
-                            disabled={!selectedOption && !isChecking}
+                            disabled={mainDisabled}
                             className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 ${
-                                !selectedOption && !isChecking ? 
-                                "bg-slate-800 text-slate-500 cursor-not-allowed"
+                                mainDisabled 
+                                ? "bg-slate-800 text-slate-500 cursor-not-allowed"
                                 : isChecking
                                     ? "bg-white text-slate-900 hover:bg-slate-200 shadow-lg shadow-white/20"
                                     : "bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-600/20"

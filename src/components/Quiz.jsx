@@ -21,7 +21,7 @@ export function Quiz({lesson, parent, onComplete}) {
     const max_selections = Number(currQuestion?.max_selections || 1)
     const isMulti = max_selections > 1
 
-    const optionKey = (o) => o.id;
+    const optionKey = (o) => o.id || o.text;
     const isSelected = (option) => (
         isMulti 
             ? selectedOptions.some(o => optionKey(o) === optionKey(option))
@@ -223,7 +223,11 @@ export function Quiz({lesson, parent, onComplete}) {
                                 <span className="text-xl">💡</span>
                                 <div>
                                     <strong className="text-white block mb-1">Explicație:</strong>
-                                    {currQuestion.explanation}
+                                    <div className="prose prose-invert text-xs max-w-none tracking-wide">
+                                        <ReactMarkdown>
+                                            {currQuestion.explanation}
+                                        </ReactMarkdown>
+                                    </div>
                                 </div>
                             </div>
                         )}

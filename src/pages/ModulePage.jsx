@@ -6,6 +6,8 @@ const ModulePage = () => {
     const { slug } = useParams();
     const [module, setModule] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [completedLessons, setCompletedLessons] = useState(new Set());
+
 
     useEffect(() => {
         const fetchModuleAndLessons = async () => {
@@ -26,7 +28,25 @@ const ModulePage = () => {
             setLoading(false)
         }
 
+        const fetchCompletedLessons = async () => {
+            const {data: {user}} = await supabase.auth.getUser();
+            
+            if (user) {
+                const {data, error} = await supabase
+                    .from('user_progress')
+                    .select('lesson_id')
+                    .eq('user_id', user.id)
+                    .eq('is_completed', true)
+                
+                if (!error && data) {
+                    setCompletedLessons(new Set(data.map(item => item.lesson_id)))
+                }
+            }
+        }
+
         fetchModuleAndLessons()
+        fetchCompletedLessons()
+
     }, [slug])
 
     if (loading){
@@ -53,25 +73,36 @@ const ModulePage = () => {
                 <p className="text-slate-400 mb-8">{module.description}</p>
 
                 <div className="space-y-3">
-                    {module.lessons.map((lesson) => (
-                        lesson.lesson_type !== 'code' && (
+                    {module.lessons.map((lesson) => {
+                        const isCompleted = completedLessons.has(lesson.id)
+
+                        return (
                             <Link 
                                 key={lesson.id}
                                 to={`/lectie/${lesson.slug}`}
-                                className=" bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
+                                className="bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
                                     <div className="flex items-center gap-3">
                                         <p className="text-xl">
                                             {lesson.lesson_type === 'theory' ? '📖' : 
                                             lesson.lesson_type === 'quiz' ? '🧩' : '💻'}
                                         </p>
-                                        <p className="font-medium">{lesson.title}</p>
+                                        <div>
+                                            <p className="font-medium">{lesson.title}</p>
+                                        </div>
                                     </div>
-                                    <span className="text-slate-500 text-sm">
-                                        {lesson.xp_reward} XP
-                                    </span>
+                                    <div className="flex items-center gap-4">
+                                        {isCompleted && (
+                                            <span className="text-xs text-green-400 flex items-center gap-1">
+                                                Completat
+                                            </span>
+                                        )}
+                                        <span className="text-slate-500 text-sm">
+                                            {lesson.xp_reward} XP
+                                        </span>
+                                    </div>
                             </Link>
                         )
-                    ))}
+                    })}
                 </div>
             </div>
         </div>

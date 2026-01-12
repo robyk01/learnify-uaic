@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { Quiz } from "../components/Quiz"
@@ -16,10 +16,12 @@ import confetti from 'canvas-confetti'
 
 const LessonPage = () => {
     const { slug } = useParams();
+    const navigate = useNavigate()
 
     const [lesson, setLesson] = useState(null)
     const [loading, setLoading] = useState(true) 
     const [parent, setParent] = useState(null)
+    const [nextLesson, setNextLesson] = useState(null)
 
     const [completing, setCompleting] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
@@ -69,6 +71,17 @@ const LessonPage = () => {
             .single()
 
             setParent(lessonParent)
+
+            const { data: nextLessonData } = await supabase
+            .from('lessons')
+            .select('slug, title')
+            .eq('module_id', data.module_id)
+            .gt('order_index', data.order_index)
+            .order('order_index', { ascending: true })
+            .limit(1)
+            .single()
+
+            if (nextLessonData) setNextLesson(nextLessonData)
 
             const {data: {session}} = await supabase.auth.getSession()
 
@@ -201,22 +214,31 @@ const LessonPage = () => {
                             </div>
 
                             <div className="mt-12  pt-6  border-t  border-slate-800 flex justify-end items-center">
-                                {/* <button className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded text-white transition">
-                                    Lecția anterioară
-                                </button> */}
+                                <div className="mr-5">
+                                    {nextLesson && (
+                                        <button
+                                            onClick={() => navigate(`/lectie/${nextLesson.slug}`)}
+                                            className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded font-medium transition duration-300 flex items-center gap-2">
+                                            Lecția următoare
+                                            <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                        </button>
+                                    )}
+                                </div>
 
-                                {!isCompleted ? (
-                                    <button
-                                        onClick={handleComplete}
-                                        disabled={completing}
-                                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold shadow-lg shadow-green-900/50 transition duration-300">
-                                        {completing ? 'Se salveaza..' : `Finalizeaza lectia (+${lesson.xp_reward} XP)` }
-                                    </button>
-                                ) : (
-                                    <button disabled className="bg-green-900/30 text-green-400 border border-green-800 px-6 py-3 rounded font-bold cursor-default">
-                                        Lecție completată
-                                    </button>
-                                )}
+                                <div>
+                                    {!isCompleted ? (
+                                        <button
+                                            onClick={handleComplete}
+                                            disabled={completing}
+                                            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-bold shadow-lg shadow-green-900/50 transition duration-300">
+                                            {completing ? 'Se salvează...' : `Finalizează lecția (+${lesson.xp_reward} XP)` }
+                                        </button>
+                                    ) : (
+                                        <button disabled className="bg-green-900/30 text-green-400 border border-green-800 px-6 py-3 rounded font-bold cursor-default">
+                                            ✓ Lecție completată
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </>
                         )}

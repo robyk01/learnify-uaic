@@ -99,6 +99,7 @@ const LessonPage = () => {
         setLoading(false)
         }
 
+        window.scrollTo(0, 0)
         fetchLesson()
     }, [slug])
 

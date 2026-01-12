@@ -58,6 +58,41 @@ const ModulePage = () => {
     }
     if (!module) return <div className="text-white p-10">Modulul nu a fost gasit.</div>
 
+    const theoryLessons = module.lessons.filter(l => l.lesson_type === 'theory')
+    const quizLessons = module.lessons.filter(l => l.lesson_type === 'quiz')
+    const codeLessons = module.lessons.filter(l => l.lesson_type === 'code')
+
+    const LessonCard = ({ lesson }) => {
+        const isCompleted = completedLessons.has(lesson.id)
+        
+        return (
+            <Link 
+                key={lesson.id}
+                to={`/lectie/${lesson.slug}`}
+                className="bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <p className="text-xl">
+                            {lesson.lesson_type === 'theory' ? '📖' : 
+                            lesson.lesson_type === 'quiz' ? '🧩' : '💻'}
+                        </p>
+                        <div>
+                            <p className="font-medium">{lesson.title}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        {isCompleted && (
+                            <span className="text-xs text-green-400 flex items-center gap-1">
+                                Completat
+                            </span>
+                        )}
+                        <span className="text-slate-500 text-sm">
+                            {lesson.xp_reward} XP
+                        </span>
+                    </div>
+            </Link>
+        )
+    }
+
     return(
         <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
             <div className="max-w-5xl mx-auto">
@@ -72,38 +107,41 @@ const ModulePage = () => {
                 <h1 className="text-3xl font-bold text-white mb-2">{module.title}</h1>
                 <p className="text-slate-400 mb-8">{module.description}</p>
 
-                <div className="space-y-3">
-                    {module.lessons.map((lesson) => {
-                        const isCompleted = completedLessons.has(lesson.id)
+                {/* Theory Lessons */}
+                {theoryLessons.length > 0 && (
+                    <div className="mb-12">
+                        <h2 className="text-md font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                            Teorie
+                        </h2>
+                        <div className="space-y-3">
+                            {theoryLessons.map(lesson => <LessonCard key={lesson.id} lesson={lesson} />)}
+                        </div>
+                    </div>
+                )}
 
-                        return (
-                            <Link 
-                                key={lesson.id}
-                                to={`/lectie/${lesson.slug}`}
-                                className="bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <p className="text-xl">
-                                            {lesson.lesson_type === 'theory' ? '📖' : 
-                                            lesson.lesson_type === 'quiz' ? '🧩' : '💻'}
-                                        </p>
-                                        <div>
-                                            <p className="font-medium">{lesson.title}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        {isCompleted && (
-                                            <span className="text-xs text-green-400 flex items-center gap-1">
-                                                Completat
-                                            </span>
-                                        )}
-                                        <span className="text-slate-500 text-sm">
-                                            {lesson.xp_reward} XP
-                                        </span>
-                                    </div>
-                            </Link>
-                        )
-                    })}
-                </div>
+                {/* Quiz Lessons */}
+                {quizLessons.length > 0 && (
+                    <div className="mb-12">
+                        <h2 className="text-md font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                            Grile
+                        </h2>
+                        <div className="space-y-3">
+                            {quizLessons.map(lesson => <LessonCard key={lesson.id} lesson={lesson} />)}
+                        </div>
+                    </div>
+                )}
+
+                {/* Code Lessons */}
+                {codeLessons.length > 0 && (
+                    <div className="mb-8">
+                        <h2 className="text-md font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                            Exerciții de cod
+                        </h2>
+                        <div className="space-y-3">
+                            {codeLessons.map(lesson => <LessonCard key={lesson.id} lesson={lesson} />)}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

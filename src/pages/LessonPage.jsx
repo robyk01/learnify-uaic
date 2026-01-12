@@ -2,6 +2,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { Quiz } from "../components/Quiz"
+import { LevelUpNotification } from "../components/LevelUpNotification";
 
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
@@ -25,6 +26,9 @@ const LessonPage = () => {
 
     const [completing, setCompleting] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
+
+    const [showLevelUp, setShowLevelUp] = useState(false)
+    const [newLevel, setNewLevel] = useState(null)
 
     function shuffleArray(array){
         if (!array) return [];
@@ -123,6 +127,12 @@ const LessonPage = () => {
             return
         }
 
+        const {data: oldProfile} = await supabase
+            .from('profiles')
+            .select('xp, level')
+            .eq('id', session.user.id)
+            .single()
+
         const {error} = await supabase
         .from('user_progress')
         .insert({
@@ -132,10 +142,27 @@ const LessonPage = () => {
 
         if (error){
             console.error(error)
-        } else {
-            setIsCompleted(true)
-            triggerConfetti()
+            setCompleting(false)
+            return
         }
+
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        // Get new level after XP update
+        const {data: newProfile} = await supabase
+            .from('profiles')
+            .select('level')
+            .eq('id', session.user.id)
+            .single()
+
+        setIsCompleted(true)
+        triggerConfetti()
+
+        if (newProfile && newProfile.level > oldProfile.level) {
+            setNewLevel(newProfile.level)
+            setShowLevelUp(true)
+        }
+
         setCompleting(false)
     }
 
@@ -160,6 +187,14 @@ const LessonPage = () => {
 
     return(
         <div className="min-h-screen bg-slate-950 text-slate-200 p-6">
+            {/* Level Up Notification */}
+            {showLevelUp && (
+                <LevelUpNotification 
+                    level={newLevel} 
+                    onClose={() => setShowLevelUp(false)} 
+                />
+            )}
+
             <div className="max-w-7xl mx-auto">
                 
                 <div className="lg:grid lg:grid-cols-12 lg:gap-12">

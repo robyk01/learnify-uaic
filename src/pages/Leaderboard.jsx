@@ -79,7 +79,7 @@ export default function Leaderboard() {
                                                 index === 2 ? "bg-orange-700/30 border-orange-700" : ""
                                                 }
                                                 ${isCurrent && !topThree ? "ring-2 ring-yellow-500 ring-inset rounded-lg" : ""}
-                                                ${isCurrent && topThree ? "ring-2 ring-yellow-400 rounded-lg" : ""}
+                                                ${isCurrent && topThree ? "ring-2 ring-yellow-400 ring-inset rounded-lg" : ""}
                                                 `}>
 
                                     <div className="col-span-2 flex justify-center items-center">

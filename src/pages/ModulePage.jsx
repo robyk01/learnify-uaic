@@ -68,7 +68,7 @@ const ModulePage = () => {
         return (
             <Link 
                 key={lesson.id}
-                to={`/lectie/${lesson.slug}`}
+                to={lesson.lesson_type === 'code' ? `/probleme/${lesson.slug}` : `/lectie/${lesson.slug}`}
                 className="bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <p className="text-xl">

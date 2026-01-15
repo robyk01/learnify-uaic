@@ -35,7 +35,7 @@ const LoginPage = () => {
                     }
                 }}
                 theme='dark'
-                providers={[]} />
+                providers={''} />
             </div>
         </div>
     );

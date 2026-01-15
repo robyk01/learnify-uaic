@@ -166,6 +166,13 @@ const LessonPage = () => {
         setCompleting(false)
     }
 
+    const nav = () => {
+        if (!nextLesson) return
+
+        navigate(`/lectie/${nextLesson.slug}`)
+        setIsCompleted(false)
+    }
+
     const triggerConfetti = () => {
         confetti({
         particleCount: 100,
@@ -253,7 +260,7 @@ const LessonPage = () => {
                                 <div className="mr-5">
                                     {nextLesson && (
                                         <button
-                                            onClick={() => navigate(`/lectie/${nextLesson.slug}`)}
+                                            onClick={nav}
                                             className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded font-medium transition duration-300 flex items-center gap-2">
                                             Lecția următoare
                                             <span className="group-hover:translate-x-1 transition-transform">→</span>

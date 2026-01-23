@@ -48,10 +48,10 @@ export default function Leaderboard() {
     const topTen = users.some(u => u.id === profile?.id)
 
     return(
-        <div className='min-h-screen bg-slate-950 text-slate-200 p-8 font-sans'>
+        <div className='min-h-screen bg-slate-950 text-slate-200 py-8 mb-8 font-sans'>
             <div className="max-w-5xl mx-auto text-center">
 
-                <div className="flex items-center justify-between mb-12 py-6">
+                <div className="flex items-center justify-between mb-6 py-6">
                     <Link to={`/`} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">
                                 <IoArrowBack className="group-hover:-translate-x-1 transition-transform" />
                                 Înapoi acasă

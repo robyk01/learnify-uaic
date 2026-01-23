@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import ModulePage from "./pages/ModulePage";
 import LessonPage from './pages/LessonPage';
@@ -9,10 +9,15 @@ import { FeedbackBtn } from "./components/Feedback";
 import Profile from "./pages/Profile";
 import ProblemList from "./pages/ProblemList";
 import ProblemPage from "./pages/ProblemPage";
+import Footer from "./components/Footer"
 
-function App() {
-  return(
-    <BrowserRouter>
+function AppContent() {
+  const location = useLocation();
+  const hideFooter = location.pathname.startsWith('/lectie/') || 
+                     location.pathname.startsWith('/probleme/');
+
+  return (
+    <>
       <Navbar />
       <FeedbackBtn />
       <Routes>
@@ -30,9 +35,18 @@ function App() {
 
         <Route path="*" element={<div className="text-white p-10">404 - Pagina nu a fost gasita!</div>} />
       </Routes>
+      
+      {!hideFooter && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
-    
 }
 
 export default App

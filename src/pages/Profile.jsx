@@ -3,13 +3,19 @@ import { supabase } from "../supabaseClient";
 import { Link } from "react-router-dom";
 
 import { IoPencil } from "react-icons/io5";
+import { IoMdCheckbox } from "react-icons/io";
+
 
 export default function Profile(){
     const [profile, setProfile] = useState(null)
     const [loading, setLoading] = useState(true);
-    const [userXP, setUserXP] = useState(0)
     const [rank, setRank] = useState(0)
     const [finishedLessons, setFinishedLessons] = useState([])
+
+    const [isEditingName, setIsEditingName] = useState(false)
+    const [newName, setNewName] = useState("")
+    const [saving, setSaving] = useState(false)
+    const [error, setError] = useState("")
 
     useEffect(() => {
         const getProfile = async () => {
@@ -30,6 +36,7 @@ export default function Profile(){
             
             if (userData) {
                 setProfile(userData);
+                setNewName(userData.username)
                 
                 const { count } = await supabase
                     .from('profiles')
@@ -66,6 +73,67 @@ export default function Profile(){
 
     }, []);
 
+    const validateUsername = (username) => {
+        const trimmed = username.trim();
+        
+        if (!trimmed) {
+            return "Numele nu poate fi gol!";
+        }
+        if (trimmed.length < 3) {
+            return "Numele trebuie să aibă cel puțin 3 caractere!";
+        }
+        if (trimmed.length > 20) {
+            return "Numele trebuie să aibă maxim 20 de caractere!";
+        }
+        if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
+            return "Numele poate conține doar litere, cifre, _ și -";
+        }
+        return null;
+    };
+
+    const handleSaveUsername = async () => {
+        setError("");
+
+        // Client-side validation
+        const validationError = validateUsername(newName);
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
+        if (newName.trim() === profile.username) {
+            setIsEditingName(false);
+            return;
+        }
+
+        setSaving(true);
+
+        const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ username: newName.trim() })
+        .eq('id', profile.id);
+
+        if (updateError) {
+            console.error('Update Error:', updateError);
+
+            if (updateError.code === '23505') {
+                setError('Acest nume este deja folosit!');
+            } else {
+                setError('Eroare la salvare. Încearcă din nou.');
+            }
+        } else {
+            setProfile({ ...profile, username: newName.trim() });
+            setIsEditingName(false);
+        }
+
+        setSaving(false);
+    };
+
+    const handleCancelEdit = () => {
+        setNewName(profile.username); 
+        setIsEditingName(false);
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen bg-slate-950">
@@ -80,14 +148,65 @@ export default function Profile(){
 
                 <aside className="flex flex-col w-full md:w-64 h-fit border border-slate-800 bg-slate-900 p-6 rounded">
                     <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-4 text-2xl font-bold text-slate-900">{profile?.username?.[0].toUpperCase()}</div>
-                    <div className="text-xl font-medium mb-1 text-white flex justify-between items-center">
-                        <span>{profile?.username}</span>
-                        <IoPencil className="text-slate-400 hover:text-white cursor-pointer transition-colors" />
+                    <div className="mb-1">
+                        {!isEditingName ? (
+                            <div className="text-xl font-medium text-white flex justify-between items-center">
+                                <span>{profile?.username}</span>
+                                <button 
+                                    onClick={() => {
+                                        setIsEditingName(true);
+                                        setError("");
+                                    }}
+                                    className="text-slate-400 hover:text-white transition-colors">
+                                    <IoPencil />
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-2">
+                                <input
+                                    type="text"
+                                    value={newName}
+                                    onChange={(e) => {
+                                        setNewName(e.target.value);
+                                        setError(""); 
+                                    }}
+                                    placeholder="Nume nou..."
+                                    className="bg-slate-800 text-white px-3 py-2 rounded border border-slate-700 focus:border-blue-500 focus:outline-none"
+                                    autoFocus
+                                    maxLength={20}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleSaveUsername();
+                                        if (e.key === 'Escape') handleCancelEdit();
+                                    }}
+                                />
+
+                                {error && (
+                                    <p className="text-red-400 text-xs">{error}</p>
+                                )}
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleSaveUsername}
+                                        disabled={saving}
+                                        className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50">
+                                        {saving ? 'Salvare...' : 'Salvează'}
+                                    </button>
+                                    <button
+                                        onClick={handleCancelEdit}
+                                        disabled={saving}
+                                        className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50">
+                                        Anulează
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
+
                     <div className="flex gap-1 mb-2 items-center">
                         <div className="text-slate-400">Clasament:</div>
                         <div className="">#{rank}</div>
                     </div>
+
                     <div className="flex items-center justify-between gap-3 py-2 text-slate-300 hover:text-white text-nowrap ">
                         <span className="text-sm font-bold text-slate-400">Nivel: {profile?.level}</span>
                         <span className="font-bold text-blue-400 font-mono">{profile?.xp} XP</span>

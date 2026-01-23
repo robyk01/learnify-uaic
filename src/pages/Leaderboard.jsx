@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { Link } from "react-router-dom";
 
+import { IoTrophy, IoArrowBack } from "react-icons/io5";
+import { FaMedal } from "react-icons/fa";
+
 export default function Leaderboard() {
     const [users, setUsers] = useState([])
     const [profile, setProfile] = useState()
@@ -48,13 +51,14 @@ export default function Leaderboard() {
         <div className='min-h-screen bg-slate-950 text-slate-200 p-8 font-sans'>
             <div className="max-w-5xl mx-auto text-center">
 
-                <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center justify-between mb-12 py-6">
                     <Link to={`/`} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">
-                                <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                                <IoArrowBack className="group-hover:-translate-x-1 transition-transform" />
                                 Înapoi acasă
                             </Link>
-                    <h1 className="text-3xl md:text-4xl font-bold text-white font-display">
-                        Top studenți 🏆
+                    <h1 className="text-3xl md:text-4xl font-bold text-white font-display flex gap-3 items-center">
+                        Top studenți 
+                         <IoTrophy className="text-yellow-500" />
                     </h1>
                     <div className="w-20"></div> {/* Spacer invizibil pt centrare */}
                 </div>
@@ -83,7 +87,10 @@ export default function Leaderboard() {
                                                 `}>
 
                                     <div className="col-span-2 flex justify-center items-center">
-                                        {index + 1}
+                                        {index === 0 ? <FaMedal className="text-yellow-400 text-2xl" /> :
+                                         index === 1 ? <FaMedal className="text-slate-400 text-2xl" /> :
+                                         index === 2 ? <FaMedal className="text-orange-600 text-2xl" /> :
+                                         index + 1}
                                     </div>
 
                                     <div className="col-span-7 flex items-center gap-3">

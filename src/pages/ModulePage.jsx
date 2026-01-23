@@ -2,6 +2,11 @@ import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 
+import { IoBookOutline } from "react-icons/io5"; 
+import { HiPuzzlePiece } from "react-icons/hi2"; 
+import { BiCodeAlt } from "react-icons/bi"; 
+import { IoCheckmarkCircle } from "react-icons/io5";
+
 const ModulePage = () => {
     const { slug } = useParams();
     const [module, setModule] = useState(null);
@@ -72,8 +77,8 @@ const ModulePage = () => {
                 className="bg-slate-900 p-4 rounded-lg border border-slate-800 hover:border-main transition-colors flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <p className="text-xl">
-                            {lesson.lesson_type === 'theory' ? '📖' : 
-                            lesson.lesson_type === 'quiz' ? '🧩' : '💻'}
+                            {lesson.lesson_type === 'theory' ? <IoBookOutline className="text-blue-400" /> : 
+                            lesson.lesson_type === 'quiz' ? <HiPuzzlePiece className="text-blue-400" /> : <BiCodeAlt className="text-blue-400"/>}
                         </p>
                         <div>
                             <p className="font-medium">{lesson.title}</p>
@@ -81,8 +86,9 @@ const ModulePage = () => {
                     </div>
                     <div className="flex items-center gap-4">
                         {isCompleted && (
-                            <span className="text-xs text-green-400 flex items-center gap-1">
+                            <span className="text-xs text-green-400 flex items-center gap-2">
                                 Completat
+                                <IoCheckmarkCircle className="text-base" />
                             </span>
                         )}
                         <span className="text-slate-500 text-sm">

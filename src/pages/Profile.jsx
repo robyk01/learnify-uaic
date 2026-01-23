@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { Link } from "react-router-dom";
 
+import { IoPencil } from "react-icons/io5";
+
 export default function Profile(){
     const [profile, setProfile] = useState(null)
     const [loading, setLoading] = useState(true);
@@ -78,7 +80,10 @@ export default function Profile(){
 
                 <aside className="flex flex-col w-full md:w-64 h-fit border border-slate-800 bg-slate-900 p-6 rounded">
                     <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-4 text-2xl font-bold text-slate-900">{profile?.username?.[0].toUpperCase()}</div>
-                    <div className="text-xl font-medium mb-1 text-white">{profile?.username}</div>
+                    <div className="text-xl font-medium mb-1 text-white flex justify-between items-center">
+                        <span>{profile?.username}</span>
+                        <IoPencil className="text-slate-400 hover:text-white cursor-pointer transition-colors" />
+                    </div>
                     <div className="flex gap-1 mb-2 items-center">
                         <div className="text-slate-400">Clasament:</div>
                         <div className="">#{rank}</div>

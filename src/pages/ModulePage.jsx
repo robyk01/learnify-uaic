@@ -69,6 +69,7 @@ const ModulePage = () => {
 
     const LessonCard = ({ lesson }) => {
         const isCompleted = completedLessons.has(lesson.id)
+        const isQuiz = lesson.lesson_type === 'quiz'
         
         return (
             <Link 
@@ -86,8 +87,8 @@ const ModulePage = () => {
                     </div>
                     <div className="flex items-center gap-4">
                         {isCompleted && (
-                            <span className="text-xs text-green-400 flex items-center gap-2">
-                                Completat
+                            <span className={`text-xs flex items-center gap-2 ${isQuiz ? 'text-blue-400' : 'text-green-400'}`}>
+                                {isQuiz ? 'Exersat' : 'Completat'}
                                 <IoCheckmarkCircle className="text-base" />
                             </span>
                         )}
@@ -128,9 +129,12 @@ const ModulePage = () => {
                 {/* Quiz Lessons */}
                 {quizLessons.length > 0 && (
                     <div className="mb-12">
-                        <h2 className="text-md font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                        <h2 className="text-md font-semibold text-slate-300 mb-1 flex items-center gap-2">
                             Grile
                         </h2>
+                        <p className="text-slate-500 text-sm mb-3 italic">
+                            Fiecare quiz conține 10 întrebări aleatorii. Poți relua quiz-ul oricând pentru întrebări noi!
+                         </p>
                         <div className="space-y-3">
                             {quizLessons.map(lesson => <LessonCard key={lesson.id} lesson={lesson} />)}
                         </div>

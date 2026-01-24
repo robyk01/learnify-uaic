@@ -58,6 +58,7 @@ const LessonPage = () => {
 
             if (data.quiz_questions && data.quiz_questions.length > 0){
                 data.quiz_questions = shuffleArray(data.quiz_questions);
+                data.quiz_questions = data.quiz_questions.slice(0, 10)
 
                 data.quiz_questions.forEach((question) => {
                     if (question.options){

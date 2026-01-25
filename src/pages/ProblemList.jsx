@@ -28,6 +28,17 @@ const ProblemList = () => {
         getProblems();
     }, [])
 
+    const groupedProblems = problems.reduce((acc, problem) => {
+        const category = problem.category || 'Altele';
+
+        if (!acc[category]){
+            acc[category] = [];
+        }
+        acc[category].push(problem);
+
+        return acc;
+    }, {});
+
 
     if (loading) {
         return (
@@ -43,29 +54,39 @@ const ProblemList = () => {
             <div className="max-w-5xl mx-auto">
                 <h1 className='text-4xl font-bold text-white mb-6'>Listă de probleme</h1>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {problems.map((problem) => (
-                        <Link
-                            to={`/probleme/${problem.lessons.slug}`}
-                            className="bg-slate-900 p-6 rounded-lg border border-slate-800 hover:bg-slate-800 transition-all group"
-                            key={problem.lessons.id}>
-                            <div className="flex items-start justify-between mb-3">
-                                <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">
-                                    {problem.lessons.title}
-                                </h3>
-                                <span className={`text-xs px-2 py-1 rounded 
-                                ${problem.difficulty === 'Ușor'
-                                    ? `bg-green-900/30 text-green-400 border border-green-800`
-                                    : problem.difficulty === 'Mediu'
-                                        ? `bg-yellow-900/30 text-yellow-400 border border-yellow-800`
-                                        : `bg-red-900/30 text-red-400 border border-red-800`}`}>
-                                    {problem.difficulty}
-                                </span>
-                            </div>
-                            <p className="text-sm text-slate-400">{problem.lessons.xp_reward} XP • Status</p>
-                        </Link>
-                    ))}
-                </div>
+                {Object.entries(groupedProblems).map(([category, categoryProblems]) => (
+                    <div key={category} className="mb-10">
+                        {/* Category */}
+                        <h2 className="text-xl font-bold text-slate-300 mb-4 border-b border-slate-800 pb-2">
+                            {category}
+                        </h2>
+
+                        {/* Problems */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {categoryProblems.map((problem) => (
+                                <Link
+                                    to={`/probleme/${problem.lessons.slug}`}
+                                    className="bg-slate-900 p-6 rounded-lg border border-slate-800 hover:bg-slate-800 transition-all group"
+                                    key={problem.lessons.id}>
+                                    <div className="flex items-start justify-between mb-3">
+                                        <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors">
+                                            {problem.lessons.title}
+                                        </h3>
+                                        <span className={`text-xs px-2 py-1 rounded shrink-0 ml-2
+                                        ${problem.difficulty === 'Ușor'
+                                            ? `bg-green-900/30 text-green-400 border border-green-800`
+                                            : problem.difficulty === 'Mediu'
+                                                ? `bg-yellow-900/30 text-yellow-400 border border-yellow-800`
+                                                : `bg-red-900/30 text-red-400 border border-red-800`}`}>
+                                            {problem.difficulty}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-slate-400">{problem.lessons.xp_reward} XP</p>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

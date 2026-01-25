@@ -98,13 +98,17 @@ const ProblemPage = () => {
     const runCases = async ( {includeHidden} ) => {
         const tests = includeHidden ? (problem?.test_cases || []) : (problem?.test_cases?.filter((t) => t.is_public) || [])
 
+        const codeToExecute = problem?.hidden_code
+            ? problem.hidden_code.replace('{{USER_CODE}}', userCode)
+            : userCode
+
         const results = []
 
         for (let i = 0; i < tests.length; i++){
             const test = tests[i]
 
             try {
-                const result = await executeCode(problem.language || 'cpp', userCode, test.input);
+                const result = await executeCode(problem.language || 'cpp', codeToExecute, test.input);
 
                 if (result?.error){
                     results.push({

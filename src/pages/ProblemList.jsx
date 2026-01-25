@@ -56,7 +56,9 @@ const ProblemList = () => {
                                 <span className={`text-xs px-2 py-1 rounded 
                                 ${problem.difficulty === 'Ușor'
                                     ? `bg-green-900/30 text-green-400 border border-green-800`
-                                    : `bg-yellow-900/30 text-yellow-400 border border-yellow-800`}`}>
+                                    : problem.difficulty === 'Mediu'
+                                        ? `bg-yellow-900/30 text-yellow-400 border border-yellow-800`
+                                        : `bg-red-900/30 text-red-400 border border-red-800`}`}>
                                     {problem.difficulty}
                                 </span>
                             </div>

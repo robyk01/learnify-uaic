@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import ModuleCard from '../components/ModuleCard'
+import { useNavigate } from 'react-router-dom'
 
 
 export default function Home() {
     const [modules, setModules] = useState([])
-    const [error, setError] = useState(null)
     const [profile, setProfile] = useState(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
     const fetchModules = async () => {
@@ -17,7 +18,6 @@ export default function Home() {
         .order('order_index', { ascending: true })
         
         if (error) {
-        setError(error.message)
         console.error('Eroare: ', error)
         } else {
         setModules(data)
@@ -52,7 +52,7 @@ export default function Home() {
                 </p>
             </div>
 
-            {/* <div className="max-w-5xl mx-auto mb-10 relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-orange-600/10 p-6 md:p-8">
+            <div className="max-w-5xl mx-auto mb-10 relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-orange-600/10 p-6 md:p-8">
                 <div className="relative z-10 flex flex-col py-4 md:flex-row items-start md:items-center justify-between gap-6">
                     
                     <div className="max-w-2xl">
@@ -73,7 +73,7 @@ export default function Home() {
                     </div>
 
                     <button 
-                        onClick={() => navigate('/simulare-sesiune')} 
+                        onClick={() => navigate('/lectie/simulare-sesiune-2026')} 
                         className="whitespace-nowrap bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 px-6 rounded-lg shadow-lg shadow-amber-500/20 transition-all transform hover:scale-105"
                     >
                         Începe →
@@ -81,7 +81,7 @@ export default function Home() {
                 </div>
 
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-amber-500/10 blur-3xl rounded-full pointer-events-none"></div>
-            </div> */}
+            </div>
 
             <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Card */}

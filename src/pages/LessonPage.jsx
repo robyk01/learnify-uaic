@@ -55,16 +55,27 @@ const LessonPage = () => {
                 setLoading(false)
                 return
             } 
+            
+            if (data.lesson_type === 'quiz'){
+                if (slug === 'simulare-sesiune-2026'){
+                    const {data: examQuestions} = await supabase
+                    .from('quiz_questions')
+                    .select('*')
+                    .eq('past_exam', true)
 
-            if (data.quiz_questions && data.quiz_questions.length > 0){
-                data.quiz_questions = shuffleArray(data.quiz_questions);
-                data.quiz_questions = data.quiz_questions.slice(0, 10)
+                    data.quiz_questions = examQuestions
+                }
 
-                data.quiz_questions.forEach((question) => {
-                    if (question.options){
-                        question.options = shuffleArray(question.options);
-                    }
-                });
+                if (data.quiz_questions && data.quiz_questions.length > 0){
+                    data.quiz_questions = shuffleArray(data.quiz_questions);
+                    data.quiz_questions = data.quiz_questions.slice(0, 10);
+
+                    data.quiz_questions.forEach((question) => {
+                        if (question.options){
+                            question.options = shuffleArray(question.options);
+                        }
+                    });
+                }
             }
             
             setLesson(data)
@@ -217,7 +228,7 @@ const LessonPage = () => {
                     )}
                     
                     
-                    <div className={lesson.lesson_type === 'quiz' ? "lg:col-span-12" : "lg:col-span-9"}>
+                    <div className={lesson.lesson_type === 'quiz' ? "lg:col-span-12 mx-auto" : "lg:col-span-9"}>
                         {lesson.lesson_type === 'quiz' && (
                             <div className="mb-6">
                                 <Link to={parent ? `/modul/${parent.slug}` : '/'} className={lesson.lesson_type === 'quiz' ? "hidden lg:flex group items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 font-medium" : "hidden"}>

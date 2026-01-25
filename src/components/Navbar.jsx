@@ -85,7 +85,6 @@ const Navbar = () => {
                                 to="/probleme"
                                 className={({ isActive }) => `relative px-3 py-3 rounded transition-all z-10 ${isActive ? "text-white bg-slate-900" : "hover:bg-slate-900"}`}>
                                     Probleme
-                                    <span className="absolute top-0 -right-3 bg-main text-[10px] text-gray-200 px-2 rounded-full z-0">Nou</span>
                             </NavLink>
 
                             <NavLink
@@ -143,12 +142,11 @@ const Navbar = () => {
 
                         <NavLink
                             to="/probleme"
-                            className={`relative py-4`}>
+                            className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
                                 <div className="flex flex-col items-center gap-1">
                                     <Code className="h-5 w-5" />
                                     <span>Probleme</span>
                                 </div>
-                                <span className="absolute top-[10px] -right-5 bg-main text-[10px] text-gray-200 px-2 rounded-full z-0">Nou</span>
                         </NavLink>
 
                         <NavLink

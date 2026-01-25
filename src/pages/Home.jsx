@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import ModuleCard from '../components/ModuleCard'
 import { useNavigate } from 'react-router-dom'
+import UpdateAlert from '../components/UpdateAlert'
 
 
 export default function Home() {
     const [modules, setModules] = useState([])
     const [profile, setProfile] = useState(null)
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -27,6 +29,7 @@ export default function Home() {
         const { data: { session } } = await supabase.auth.getSession()
 
         if (session?.user) {
+          setIsAuthenticated(true)
           const { data: profileData } = await supabase
             .from('profiles')
             .select('*')
@@ -40,8 +43,19 @@ export default function Home() {
     fetchModules()
     }, [])
 
+    const handleMockupClick = () => {
+        if (!isAuthenticated) {
+            alert('Trebuie să fii autentificat pentru a accesa simularea de examen!');
+            navigate('/login');
+            return;
+        }
+        navigate('/lectie/simulare-sesiune-2026');
+    }
+
     return (
         <div className='min-h-screen bg-slate-950 text-slate-200 p-8 font-sans mb-12'>
+
+            <UpdateAlert />
 
             <div className="max-w-5xl mx-auto mb-20 text-center">
                 <h1 className='text-4xl font-bold text-white mb-2'>
@@ -56,8 +70,8 @@ export default function Home() {
                 <div className="relative z-10 flex flex-col py-4 md:flex-row items-start md:items-center justify-between gap-6">
                     
                     <div className="max-w-2xl">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="bg-amber-500 text-black text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wide">
+                        <div className="flex flex-col lg:flex-row lg:items-center gap-2 mb-2">
+                            <span className="bg-amber-500 w-fit text-black text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wide">
                                 Nou
                             </span>
                             <h2 className="text-2xl font-bold text-white">
@@ -73,7 +87,7 @@ export default function Home() {
                     </div>
 
                     <button 
-                        onClick={() => navigate('/lectie/simulare-sesiune-2026')} 
+                        onClick={handleMockupClick} 
                         className="whitespace-nowrap bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 px-6 rounded-lg shadow-lg shadow-amber-500/20 transition-all transform hover:scale-105"
                     >
                         Începe →

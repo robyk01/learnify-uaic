@@ -44,6 +44,16 @@ const LessonPage = () => {
 
     useEffect(() => {
         const fetchLesson = async () => {
+            if (slug === 'simulare-sesiune-2026') {
+                const { data: { session } } = await supabase.auth.getSession();
+            
+                if (!session?.user) {
+                    navigate('/login');
+                    setLoading(false);
+                    return;
+                }
+            }
+
             const {data, error} = await supabase
             .from('lessons')
             .select('*, quiz_questions(*)')

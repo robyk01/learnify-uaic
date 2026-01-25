@@ -16,7 +16,7 @@ export default function Leaderboard() {
             .from("profiles")
             .select("*")
             .order("xp", {ascending: false})
-            .limit(10)
+            .limit(30)
 
             if (!error) setUsers(data)
 

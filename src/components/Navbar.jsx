@@ -1,14 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import { SubjectContext } from "./SubjectContext";
 
-import { Home, Code, Trophy } from "lucide-react";
+import { Home, Code, Trophy, Settings, LogOut } from "lucide-react";
 
 const Navbar = () => {
+    const { setSelectedSubject } = useContext(SubjectContext);
     const [profile, setProfile] = useState(null)
     const [openProfile, setOpenProfile] = useState(null)
+    const [subjects, setSubjects] = useState([]);
+
 
     useEffect(() => {
+        const fetchSubjects = async () => {
+            const { data, error } = await supabase
+                .from('subjects')
+                .select('id, title, shortname')
+                .eq('is_active', true);
+            
+
+            console.log("Subjects fetched:", data);  {/* DEBUG */}
+            console.log("Error:", error);
+
+            const subjectsWithGradients = data?.map((subject, index) => ({
+                ...subject,
+                gradient: [
+                    "from-purple-500 via-purple-600 to-purple-700",
+                    "from-green-500 via-green-600 to-green-700",
+                    "from-orange-500 via-orange-600 to-orange-700"
+                ][index % 3]
+            })) || [];
+            
+            setSubjects(subjectsWithGradients);
+        };
+
         const fetchProfile = async () => {
             const {data: {session}} = await supabase.auth.getSession()
 
@@ -26,6 +52,7 @@ const Navbar = () => {
         }
 
         fetchProfile()
+        fetchSubjects()
 
         const {data: {subscription: authListener}} = supabase.auth.onAuthStateChange((_event, session) => {
             if (session) fetchProfile()
@@ -52,7 +79,12 @@ const Navbar = () => {
             authListener.unsubscribe()
             supabase.removeChannel(channel)
         }
+
     }, [])
+
+    const handleSubjectClick = (subject) => {
+        setSelectedSubject(subject);
+    };
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
@@ -63,60 +95,88 @@ const Navbar = () => {
 
     return(
         <>
-            <nav className="sticky top-0 w-full z-50 glass-nav border-b border-slate-800">
-                <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-10">
-                    <div className="flex justify-center items-center h-16 relative">
+            <nav className="fixed top-0 left-0 h-screen w-24 z-50 glass-nav border-r border-slate-800 flex flex-col items-center gap-6 py-6">
+                {/* Logo */}
+                <div className="flex flex-col items-center gap-6">
+                    <Link 
+                        to="/" 
+                        className="w-16 h-16 rounded-3xl bg-gradient-to-br from-white to-white flex items-center justify-center text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 backdrop-blur-md border border-blue-400/30">
+                        <img src="/icon_blue.png" alt="Logo" className="h-8" />
+                    </Link>
+                    <div className="w-12 h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
 
-                        {/* Logo */}
-                        <Link to='/' className="absolute left-0 text-xl font-bold text-white flex items-center gap-2">
-                            <img src="/logo.png" className="h-8"></img>
-                            <span className="bg-main text-white px-2 py-1 rounded-lg text-xs">UAIC</span>
-                        </Link>
+                </div>
 
-                        {/* Desktop Menu */}
-                        <ul className="hidden md:flex lg:flex  gap-1 text-slate-400 text-sm font-medium cursor-pointer">
-                            <NavLink
-                                to="/"
-                                className={({ isActive }) => `relative px-3 py-3 rounded transition-all ${isActive ? "text-white bg-slate-900" : "hover:bg-slate-900"}`}>
-                                Acasă
-                            </NavLink>
+                {/* Desktop Menu */}
+                <div className="flex-1 flex flex-col items-center gap-4 overflow-y-auto scrollbar-hide">
+                    {subjects.map((subject) => (
+                        <button
+                            key={subject.id}
+                            onClick={() => handleSubjectClick(subject)}
+                            className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-white backdrop-blur-md border transition-all duration-300 overflow-hidden relative group bg-gradient-to-br ${subject.gradient} border-white/20 opacity-70 hover:opacity-100 hover:shadow-lg hover:border-white/30`}>
+                            
+                            <span className="relative z-10">{subject.shortname}</span>
+                        </button>
+                    ))}
+                </div>
 
-                            <NavLink
-                                to="/probleme"
-                                className={({ isActive }) => `relative px-3 py-3 rounded transition-all z-10 ${isActive ? "text-white bg-slate-900" : "hover:bg-slate-900"}`}>
-                                    Probleme
-                            </NavLink>
+                {/* Profile */}
+                <div className="flex flex-col items-center gap-6">
+                    <div className="w-12 h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
+                    
+                    {/* Clasament */}
+                    <NavLink
+                        to="/clasament"
+                        className={({ isActive }) => `w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
+                            isActive
+                                ? "bg-gradient-to-br from-yellow-500 to-yellow-600 text-white border-white/30 shadow-lg shadow-yellow-500/50"
+                                : "bg-slate-800/50 text-slate-400 border-slate-700/50 hover:text-white hover:shadow-lg"
+                        }`}>
+                        <Trophy className="h-6 w-6" />
+                    </NavLink>
 
-                            <NavLink
-                                to="/clasament"
-                                className={({ isActive }) => `relative px-3 py-3 rounded transition-all ${isActive ? "text-white bg-slate-900" : "hover:bg-slate-900"}`}>
-                                    Clasament
-                            </NavLink>
-                        </ul>
-
-                            {/* Profile */}
-                            {profile ? (
-                                <div className="absolute right-0">
-                                    <button onClick={() => setOpenProfile(!openProfile)} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-900 cursor-pointer">{profile?.username?.[0].toUpperCase()}</button>
+                    {profile ? (
+                        <div className="relative">
+                            <button onClick={() => setOpenProfile(!openProfile)}
+                                    className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-white font-bold backdrop-blur-md border border-slate-600/50 hover:border-white/30 transition-all duration-300 hover:shadow-lg">
+                                        {profile?.username?.[0].toUpperCase()}
+                            </button>
+                            
+                            {openProfile && (
+                                <div className="absolute left-20 bottom-0 mb-2 w-48 p-2 bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl animate-in fade-in slide-in-from-left-2 duration-200">
+                                    <div className="flex items-center gap-3 px-2 py-3 border-b border-slate-700 mb-2">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-bold text-white truncate">{profile?.username}</p>
+                                            <p className="text-xs text-slate-400">Lvl {profile?.level}</p>
+                                        </div>
+                                    </div>
                                     
-                                    {openProfile && (
-                                        <div className="absolute flex flex-col gap-2 right-0 mt-4 px-2 w-48 py-4 bg-slate-900 rounded-xl border border-slate-800 animate-in fade-in zoom-in-95 duration-200">
-                                            <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-slate-800 text-slate-300 hover:text-white text-nowrap ">
-                                                <span className="text-xs font-bold text-slate-400">Lvl {profile.level}</span>
-                                                <span className="text-sm font-bold text-blue-400 font-mono">{profile.xp} XP</span>
-                                            </div>
-                                            <Link to="/profil" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Profil</Link>
-                                            {/* <Link to="/setari" className="block px-4 py-2 text-sm text-slate-300 border-b border-slate-800 hover:bg-slate-700 hover:text-white rounded transition">Setări</Link> */}
-                                            <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 rounded transition">Logout</button>
-                                    </div> )}
-                                </div>
-                                
-                                
-                            ) : (
-                                <Link to="/login" className="absolute right-0 text-white text-sm bg-main hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition">Intra in cont</Link>
-                            )}
+                                    <div className="flex items-center justify-between px-2 py-2 rounded-lg mb-3">
+                                        <span className="text-xs text-slate-400">Experiență</span>
+                                        <span className="text-sm font-bold text-blue-400 font-mono">{profile?.xp} XP</span>
+                                    </div>
 
-                    </div>
+                                    <Link 
+                                        to="/profil" 
+                                        className="flex items-center gap-2 w-full px-2 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition mb-2">
+                                        <Settings className="h-4 w-4" />
+                                        Setări
+                                    </Link>
+                                    
+                                    <button 
+                                        onClick={handleLogout}
+                                        className="flex items-center gap-2 w-full px-2 py-2 text-sm text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-lg transition">
+                                        <LogOut className="h-4 w-4" />
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        
+                        
+                    ) : (
+                        <Link to="/login" className="absolute right-0 text-white text-sm bg-main hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition">Intra in cont</Link>
+                    )}
                 </div>
             </nav>
             

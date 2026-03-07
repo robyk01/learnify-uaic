@@ -91,7 +91,7 @@ const LessonPage = () => {
             setLesson(data)
 
             const { data: lessonParent } = await supabase
-            .from('modules')
+            .from('chapters')
             .select('*')
             .eq('id', data.module_id)
             .single()

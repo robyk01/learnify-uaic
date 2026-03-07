@@ -17,7 +17,7 @@ const ModulePage = () => {
     useEffect(() => {
         const fetchModuleAndLessons = async () => {
             const {data, error} = await supabase
-            .from('modules')
+            .from('chapters')
             .select('*, lessons(*)')
             .eq('slug', slug)
             .single()

@@ -6,15 +6,15 @@ import UpdateAlert from '../components/UpdateAlert'
 
 
 export default function Home() {
-    const [modules, setModules] = useState([])
+    const [chapters, setchapters] = useState([])
     const [profile, setProfile] = useState(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
-    const fetchModules = async () => {
+    const fetchchapters = async () => {
         const {data, error} = await supabase
-        .from('modules')
+        .from('chapters')
         .select('*')
         .eq('hidden', false)
         .order('order_index', { ascending: true })
@@ -22,7 +22,7 @@ export default function Home() {
         if (error) {
         console.error('Eroare: ', error)
         } else {
-        setModules(data)
+        setchapters(data)
         console.log('Date primite: ', data)
         }
 
@@ -40,7 +40,7 @@ export default function Home() {
       }
     }
 
-    fetchModules()
+    fetchchapters()
     }, [])
 
     const handleMockupClick = () => {
@@ -99,7 +99,7 @@ export default function Home() {
 
             <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Card */}
-                {modules.map((modul) => (
+                {chapters.map((modul) => (
                     <ModuleCard key={modul.id} module={modul} />
                 ))}
             </div>

@@ -73,7 +73,7 @@ const SidebarMenu = () => {
                 </div>
                 <button 
                     onClick={closeSubject}
-                    className="text-slate-400 hover:text-white transition">
+                    className="text-slate-400 hover:text-white transition hidden md:block">
                     ✕
                 </button>
             </div>

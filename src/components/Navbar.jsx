@@ -92,8 +92,11 @@ const Navbar = () => {
         <>
             {/* Mobile Menu Button */}
             <button
-                onClick={() => setNavOpen(!navOpen)}
-                className="fixed top-6 left-6 z-50 md:hidden p-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white hover:bg-slate-700 transition">
+                onClick={() => {
+                    setNavOpen(!navOpen)
+                    setSelectedSubject(!selectedSubject)
+                }}
+                className="fixed top-6 right-6 z-50 md:hidden p-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white hover:bg-slate-700 transition">
                 {navOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
 

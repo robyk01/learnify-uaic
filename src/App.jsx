@@ -26,7 +26,7 @@ function AppContent() {
       {showSidebar && <SidebarMenu />}
       <FeedbackBtn />
 
-      <main className={`transition-all ${showSidebar && 'ml-24'}`}>
+      <main className={`transition-all ${showSidebar}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/capitol/:slug" element={<ModulePage />} />

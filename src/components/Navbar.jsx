@@ -3,13 +3,14 @@ import { Link, NavLink } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { SubjectContext } from "./SubjectContext";
 
-import { Home, Code, Trophy, Settings, LogOut } from "lucide-react";
+import { Home, Code, Trophy, Settings, LogOut, Menu, X } from "lucide-react";
 
 const Navbar = () => {
     const { selectedSubject, setSelectedSubject, closeSubject, handleSubjectClick } = useContext(SubjectContext);
     const [profile, setProfile] = useState(null)
     const [openProfile, setOpenProfile] = useState(null)
     const [subjects, setSubjects] = useState([]);
+    const [navOpen, setNavOpen] = useState(false)
 
 
     useEffect(() => {
@@ -88,12 +89,24 @@ const Navbar = () => {
 
     return(
         <>
-            <nav className="fixed top-0 left-0 h-screen w-24 z-50 glass-nav border-r border-slate-800 flex flex-col items-center gap-6 py-6">
+            {/* Mobile Menu Button */}
+            <button
+                onClick={() => setNavOpen(!navOpen)}
+                className="fixed top-6 left-6 z-50 md:hidden p-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white hover:bg-slate-700 transition">
+                {navOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+
+            <nav className={`fixed top-0 left-0 h-screen w-24 z-50 glass-nav border-r border-slate-800 flex flex-col items-center gap-6 py-6 transition-transform duration-300 md:translate-x-0 ${
+                navOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+            }`}>
                 {/* Logo */}
                 <div className="flex flex-col items-center gap-6">
                     <Link 
                         to="/" 
-                        onClick={() => setSelectedSubject(null)}
+                        onClick={() => {
+                            setSelectedSubject(null)
+                            setNavOpen(false)
+                        }}
                         className="w-16 h-16 rounded-3xl bg-gradient-to-br from-white to-white flex items-center justify-center text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 backdrop-blur-md border border-blue-400/30">
                         <img src="/icon_blue.png" alt="Logo" className="h-8" />
                     </Link>
@@ -125,7 +138,10 @@ const Navbar = () => {
                     {/* Clasament */}
                     <NavLink
                         to="/clasament"
-                        onClick={() => setSelectedSubject(null)}
+                        onClick={() => {
+                            setSelectedSubject(null)
+                            setNavOpen(false)
+                        }}
                         className={({ isActive }) => `w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
                             isActive
                                 ? "bg-gradient-to-br from-yellow-500 to-yellow-600 text-white border-white/30 shadow-lg shadow-yellow-500/50"
@@ -185,7 +201,15 @@ const Navbar = () => {
                 ></div>
             )}
 
+            {navOpen && (
+                <div 
+                    className="fixed inset-0 z-40 md:hidden" 
+                    onClick={() => setNavOpen(false)}
+                ></div>
+            )}
+
             {/* Mobile Menu Bottom */}
+            
             {/* <div className="w-full fixed bottom-0 bg-slate-900/50 glass-nav rounded-t-3xl border-t border-slate-600 z-10">
                 <ul className=" flex justify-around md:hidden lg:hidden list-none gap-1 text-slate-400 text-xs font-medium cursor-pointer">
                     <NavLink

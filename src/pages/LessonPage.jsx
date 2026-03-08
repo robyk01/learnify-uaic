@@ -228,7 +228,7 @@ const LessonPage = () => {
                 
                 <div className="lg:grid lg:grid-cols-12 lg:gap-6">
                     {lesson.lesson_type === 'theory' && (
-                        <div className="hidden lg:block lg:col-span-3 sticky top-8 py-2">
+                        <div className="lg:col-span-3 sticky top-8 py-2">
                             <Link to={`/capitol/${parent.slug}`} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 text-sm font-medium">
                                 <span className="group-hover:-translate-x-1 transition-transform">←</span>
                                 Înapoi la lecții

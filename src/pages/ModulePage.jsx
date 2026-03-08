@@ -82,7 +82,7 @@ const ModulePage = () => {
                             lesson.lesson_type === 'quiz' ? <HiPuzzlePiece className="text-blue-400" /> : <BiCodeAlt className="text-blue-400"/>}
                         </p>
                         <div>
-                            <p className="font-medium">{lesson.title}</p>
+                            <p className="font-medium text-sm">{lesson.title}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">

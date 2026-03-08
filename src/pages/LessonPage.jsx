@@ -93,7 +93,7 @@ const LessonPage = () => {
             const { data: lessonParent } = await supabase
             .from('chapters')
             .select('*')
-            .eq('id', data.module_id)
+            .eq('id', data.chapter_id)
             .single()
 
             setParent(lessonParent)
@@ -101,7 +101,7 @@ const LessonPage = () => {
             const { data: nextLessonData } = await supabase
             .from('lessons')
             .select('slug, title')
-            .eq('module_id', data.module_id)
+            .eq('chapter_id', data.chapter_id)
             .gt('order_index', data.order_index)
             .order('order_index', { ascending: true })
             .limit(1)
@@ -224,21 +224,21 @@ const LessonPage = () => {
                 />
             )}
 
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-5xl mx-auto">
                 
-                <div className="lg:grid lg:grid-cols-12 lg:gap-12">
+                <div className="lg:grid lg:grid-cols-12 lg:gap-6">
                     {lesson.lesson_type === 'theory' && (
                         <div className="hidden lg:block lg:col-span-3 sticky top-8 py-2">
-                            <Link to={parent ? `/modul/${parent.slug}` : '/'} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 text-sm font-medium">
+                            <Link to={`/capitol/${parent.slug}`} className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 text-sm font-medium">
                                 <span className="group-hover:-translate-x-1 transition-transform">←</span>
                                 Înapoi la lecții
                             </Link>
-                            <TableOfContents headings={headings} />
+                            {/* <TableOfContents headings={headings} /> */}
                         </div>
                     )}
                     
                     
-                    <div className={lesson.lesson_type === 'quiz' ? "lg:col-span-12 mx-auto" : "lg:col-span-9"}>
+                    <div className={`lg:col-span-12`}>
                         {lesson.lesson_type === 'quiz' && (
                             <div className="mb-6">
                                 <Link to={parent ? `/modul/${parent.slug}` : '/'} className={lesson.lesson_type === 'quiz' ? "hidden lg:flex group items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 font-medium" : "hidden"}>
@@ -257,7 +257,7 @@ const LessonPage = () => {
                                     {lesson.xp_reward} XP
                                 </span>
                             </div>
-                            <h1 className="font-display text-4xl md:text-5xl font-bold text-white leading-tight">
+                            <h1 className="font-display text-xl md:text-4xl font-bold text-white leading-tight">
                                 {lesson.title}
                             </h1>
                         </div>

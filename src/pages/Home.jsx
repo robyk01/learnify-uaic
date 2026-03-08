@@ -83,7 +83,7 @@ export default function Home() {
             {/* <UpdateAlert /> */}
 
             <div className="max-w-5xl mx-auto mb-20 pb-10 border-b border-slate-800 text-center flex flex-col gap-12">
-                <div className="flex justify-center">
+                <div className="flex justify-center pointer-events-none">
                     <img src="/logo.png" className='w-48'></img>
                 </div>
                 <div className="">
@@ -105,7 +105,7 @@ export default function Home() {
                         <p className="text-slate-400 mb-6">din capitolul <span className="text-blue-400">{lastLesson.chapter.title}</span></p>
                         <Link 
                             to={`/lectie/${lastLesson.slug}`}
-                            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300">
+                            className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-3 rounded-lg font-medium transition duration-300">
                             Continuă lecția →
                         </Link>
                     </div>

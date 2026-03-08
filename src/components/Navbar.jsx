@@ -6,7 +6,7 @@ import { SubjectContext } from "./SubjectContext";
 import { Home, Code, Trophy, Settings, LogOut } from "lucide-react";
 
 const Navbar = () => {
-    const { setSelectedSubject } = useContext(SubjectContext);
+    const { selectedSubject, setSelectedSubject, closeSubject } = useContext(SubjectContext);
     const [profile, setProfile] = useState(null)
     const [openProfile, setOpenProfile] = useState(null)
     const [subjects, setSubjects] = useState([]);
@@ -83,14 +83,17 @@ const Navbar = () => {
     }, [])
 
     const handleSubjectClick = (subject) => {
-        setSelectedSubject(subject);
+        if (selectedSubject?.id === subject.id) {
+            closeSubject();
+        } else {
+            setSelectedSubject(subject);
+        }
     };
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
         setProfile(null)
     }
-
     
 
     return(
@@ -100,6 +103,7 @@ const Navbar = () => {
                 <div className="flex flex-col items-center gap-6">
                     <Link 
                         to="/" 
+                        onClick={() => setSelectedSubject(null)}
                         className="w-16 h-16 rounded-3xl bg-gradient-to-br from-white to-white flex items-center justify-center text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 backdrop-blur-md border border-blue-400/30">
                         <img src="/icon_blue.png" alt="Logo" className="h-8" />
                     </Link>
@@ -113,7 +117,11 @@ const Navbar = () => {
                         <button
                             key={subject.id}
                             onClick={() => handleSubjectClick(subject)}
-                            className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-white backdrop-blur-md border transition-all duration-300 overflow-hidden relative group bg-gradient-to-br ${subject.gradient} border-white/20 opacity-70 hover:opacity-100 hover:shadow-lg hover:border-white/30`}>
+                            className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-white backdrop-blur-md border transition-all duration-300 overflow-hidden relative group bg-gradient-to-br ${subject.gradient} ${
+                                selectedSubject?.id === subject.id 
+                                    ? 'border-white/30 shadow-lg shadow-current/50 opacity-100'
+                                    : 'border-white/20 opacity-70 hover:opacity-100 hover:shadow-lg hover:border-white/30'
+                            }`}>
                             
                             <span className="relative z-10">{subject.shortname}</span>
                         </button>

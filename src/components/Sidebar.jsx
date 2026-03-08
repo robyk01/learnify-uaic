@@ -1,20 +1,35 @@
-import { useEffect, useState, useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { useEffect, useState, useContext, useRef } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { SubjectContext } from "./SubjectContext";
-import { ChevronDown } from "lucide-react";
 
 const SidebarMenu = () => {
-    const { selectedSubject } = useContext(SubjectContext);
+    const { selectedSubject, setSelectedSubject, isClosing, closeSubject } = useContext(SubjectContext);
     const [chapters, setChapters] = useState([]);
     const [loading, setLoading] = useState(false);
+    const location = useLocation();
+    const prevSubjectRef = useRef(null)
+    const [shouldAnimate, setShouldAnimate] = useState(false);
+
+    // useEffect(() => {
+    //     setSelectedSubject(null);
+    // }, [location.pathname, setSelectedSubject]);
 
     useEffect(() => {
-        if (!selectedSubject) return;
+        if (selectedSubject && !prevSubjectRef.current) {
+            setShouldAnimate(true);
+        }
+        prevSubjectRef.current = selectedSubject;
+    }, [selectedSubject]);
+
+    useEffect(() => {
+        if (!selectedSubject) { 
+            return;
+        }
+
+        setLoading(true);
 
         const fetchChapters = async () => {
-            setLoading(true);
-
             const { data: chaptersData, error } = await supabase
                 .from('chapters')
                 .select('id, title, slug, order_index')
@@ -32,9 +47,15 @@ const SidebarMenu = () => {
 
     if (!selectedSubject) return null;
 
+    const animationClass = isClosing 
+        ? 'animate-out slide-out-to-left duration-200' 
+        : shouldAnimate 
+        ? 'animate-in slide-in-from-left duration-200' 
+        : '';
+
     if (loading) {
         return (
-            <aside className="w-80 h-screen bg-slate-900/30 backdrop-blur-xl border-r border-slate-700/50 fixed left-24 top-0 z-40 animate-pulse">
+            <aside className={`w-80 h-screen bg-slate-900 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
                 <div className="p-6 space-y-4">
                     <div className="h-8 bg-slate-700 rounded w-3/4"></div>
                 </div>
@@ -43,11 +64,18 @@ const SidebarMenu = () => {
     }
 
     return (
-        <aside className="w-80 h-screen bg-slate-900/30 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40">
+        <aside className={`w-80 h-screen bg-slate-900 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
             
-            <div className="p-6 border-b border-slate-700/50 flex-shrink-0">
-                <h2 className="text-2xl font-bold text-white">{selectedSubject.title}</h2>
-                <p className="text-xs text-slate-400 mt-2">Capitole</p>
+            <div className="p-6 border-b border-slate-700/50 flex-shrink-0 flex justify-between items-start">
+                <div>
+                    <h2 className="text-xl font-bold text-white">{selectedSubject.title}</h2>
+                    <p className="text-xs text-slate-400 mt-2">Capitole</p>
+                </div>
+                <button 
+                    onClick={closeSubject}
+                    className="text-slate-400 hover:text-white transition">
+                    ✕
+                </button>
             </div>
 
             <div className="flex-1 overflow-y-auto scrollbar-hide p-4">

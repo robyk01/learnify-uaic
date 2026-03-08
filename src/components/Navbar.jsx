@@ -171,10 +171,8 @@ const Navbar = () => {
                                 </div>
                             )}
                         </div>
-                        
-                        
                     ) : (
-                        <Link to="/login" className="absolute right-0 text-white text-sm bg-main hover:bg-blue-700 px-4 py-2 rounded-lg font-medium transition">Intra in cont</Link>
+                        <Link to="/login" className="flex items-center justify-center text-white text-sm bg-main hover:bg-blue-700  px-4 py-2 rounded-lg font-medium transition">Login</Link>
                     )}
                 </div>
             </nav>

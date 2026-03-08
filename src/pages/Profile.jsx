@@ -143,7 +143,7 @@ export default function Profile(){
     }
 
     return(
-        <div className='min-h-screen bg-slate-950 text-slate-200 p-8 font-sans'>
+        <div className='min-h-screen text-slate-200 p-8 font-sans'>
             <div className="flex flex-col md:flex-row gap-8 md:gap-12 max-w-5xl mx-auto">
 
                 <aside className="flex flex-col w-full md:w-64 h-fit border border-slate-800 bg-slate-900 p-6 rounded">

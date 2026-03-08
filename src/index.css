@@ -6,6 +6,8 @@
 
 body {
   @apply bg-slate-950 text-slate-200; 
+  background: linear-gradient(135deg, #000 0%, #18212f 50%, #000 100%);
+  background-attachment: fixed;
 }
 
 @media (max-width: 768px) {

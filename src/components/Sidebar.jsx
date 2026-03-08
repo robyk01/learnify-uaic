@@ -64,7 +64,7 @@ const SidebarMenu = () => {
     }
 
     return (
-        <aside className={`w-80 h-screen bg-slate-900 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
+        <aside className={`w-80 h-screen bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
             
             <div className="p-6 border-b border-slate-700/50 flex-shrink-0 flex justify-between items-start">
                 <div>

@@ -78,11 +78,11 @@ export default function Home() {
     }, [])
 
     return (
-        <div className='min-h-screen bg-slate-950 text-slate-200 p-8 font-sans mb-12'>
+        <div className='min-h-screen text-slate-200 p-8 font-sans mb-12'>
 
             <UpdateAlert />
 
-            <div className="max-w-5xl mx-auto mb-10 text-center flex flex-col gap-12">
+            <div className="max-w-5xl mx-auto mb-20 pb-10 border-b border-slate-800 text-center flex flex-col gap-12">
                 <div className="flex justify-center">
                     <img src="/logo.png" className='w-48'></img>
                 </div>
@@ -98,8 +98,8 @@ export default function Home() {
             </div>
 
             {lastLesson && (
-                <div className="max-w-5xl mx-auto mb-10 rounded-xl">
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 md:p-8">
+                <div className="max-w-5xl mx-auto rounded-xl pb-10">
+                    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 md:p-8">
                         <p className="text-slate-400 mb-3">Ai rămas la lecția:</p>
                         <h2 className="text-2xl font-bold text-white mb-2">{lastLesson.title}</h2>
                         <p className="text-slate-400 mb-6">din capitolul <span className="text-blue-400">{lastLesson.chapter.title}</span></p>
@@ -112,16 +112,38 @@ export default function Home() {
                 </div>
             )}
 
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-5xl mx-auto ">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {subjects.map((subject) => (
                         <div key={subject.id} onClick={() => handleSubjectClick(subject)} className="cursor-pointer">
-                            <ModuleCard module={subject} />
+                            <ModuleCard subject={subject} />
                         </div>
                     ))}
                 </div>
             </div>
-            
+
+
+            <div className="max-w-5xl mx-auto mt-20 pt-10 mb-20 border-t border-slate-800">
+                <h2 className="text-2xl font-bold text-white mb-4">Noutăți</h2>
+                <div className="space-y-4">
+                    <div className="border border-slate-800 p-4 rounded-lg ">
+                        <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-white">Meniu complet refăcut</h3>
+                            <span className="text-xs text-slate-500">8 Mar</span>
+                        </div>
+                        <p className="text-sm text-slate-400">Meniul materiilor se află în partea stângă. Click pe o materie să vezi cursurile.</p>
+                    </div>
+
+                    <div className="border border-slate-800 p-4 rounded-lg ">
+                        <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-white">Adăugat ultimul progres</h3>
+                            <span className="text-xs text-slate-500">8 Mar</span>
+                        </div>
+                        <p className="text-sm text-slate-400">Pe prima pagina poți să vezi unde ai ajuns cu învățatul.</p>
+                    </div>
+                </div>
+
+            </div>
 
         </div>
     )

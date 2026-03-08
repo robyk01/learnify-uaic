@@ -186,36 +186,36 @@ const Navbar = () => {
             )}
 
             {/* Mobile Menu Bottom */}
-            <div className="w-full fixed bottom-0 bg-slate-900/50 glass-nav rounded-t-3xl border-t border-slate-600 z-10">
+            {/* <div className="w-full fixed bottom-0 bg-slate-900/50 glass-nav rounded-t-3xl border-t border-slate-600 z-10">
                 <ul className=" flex justify-around md:hidden lg:hidden list-none gap-1 text-slate-400 text-xs font-medium cursor-pointer">
-                        <NavLink
-                            to="/"
-                            className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
+                    <NavLink
+                        to="/"
+                        className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
+                        <div className="flex flex-col items-center gap-1">
+                            <Home className="h-5 w-5" />
+                            <span>Acasă</span>
+                        </div>
+                    </NavLink>
+
+                    <NavLink
+                        to="/probleme"
+                        className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
                             <div className="flex flex-col items-center gap-1">
-                                <Home className="h-5 w-5" />
-                                <span>Acasă</span>
+                                <Code className="h-5 w-5" />
+                                <span>Probleme</span>
                             </div>
-                        </NavLink>
+                    </NavLink>
 
-                        <NavLink
-                            to="/probleme"
-                            className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
-                                <div className="flex flex-col items-center gap-1">
-                                    <Code className="h-5 w-5" />
-                                    <span>Probleme</span>
-                                </div>
-                        </NavLink>
-
-                        <NavLink
-                            to="/clasament"
-                            className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
-                                <div className="flex flex-col items-center gap-1">
-                                    <Trophy className="h-5 w-5" />
-                                    <span>Clasament</span>
-                                </div>
-                        </NavLink>
-                    </ul>
-            </div>
+                    <NavLink
+                        to="/clasament"
+                        className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
+                            <div className="flex flex-col items-center gap-1">
+                                <Trophy className="h-5 w-5" />
+                                <span>Clasament</span>
+                            </div>
+                    </NavLink>
+                </ul>
+            </div> */}
         </>
     );
 }

@@ -80,7 +80,7 @@ export default function Home() {
     return (
         <div className='min-h-screen text-slate-200 p-8 font-sans mb-12'>
 
-            <UpdateAlert />
+            {/* <UpdateAlert /> */}
 
             <div className="max-w-5xl mx-auto mb-20 pb-10 border-b border-slate-800 text-center flex flex-col gap-12">
                 <div className="flex justify-center">

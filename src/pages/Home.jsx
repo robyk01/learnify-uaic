@@ -1,63 +1,88 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { supabase } from '../supabaseClient'
 import ModuleCard from '../components/ModuleCard'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import UpdateAlert from '../components/UpdateAlert'
+import { SubjectContext } from '../components/SubjectContext'
 
 
 export default function Home() {
-    const [chapters, setchapters] = useState([])
+    const [subjects, setSubjects] = useState([])
     const [profile, setProfile] = useState(null)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [lastLesson, setLastLesson] = useState(null)
     const navigate = useNavigate()
+    const { handleSubjectClick } = useContext(SubjectContext)
 
     useEffect(() => {
     const fetchchapters = async () => {
         const {data, error} = await supabase
-        .from('chapters')
+        .from('subjects')
         .select('*')
-        .eq('hidden', false)
-        .order('order_index', { ascending: true })
+        .eq('is_active', true)
         
         if (error) {
         console.error('Eroare: ', error)
         } else {
-        setchapters(data)
-        console.log('Date primite: ', data)
+        setSubjects(data)
         }
 
         const { data: { session } } = await supabase.auth.getSession()
 
         if (session?.user) {
-          setIsAuthenticated(true)
-          const { data: profileData } = await supabase
+            setIsAuthenticated(true)
+            const { data: profileData } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single()
+            
+            setProfile(profileData)
+
+            const { data: progressData, error: progressError } = await supabase
+            .from('user_progress')
+            .select('lesson_id, completed_at')
+            .eq('user_id', session.user.id)
+            .order('completed_at', {ascending: false})
+            .limit(1)
+            .single()
+
+            if (progressError) {
+                console.error('Progress error:', progressError)
+            }
+
+            if (progressData){
+                const { data: lessonData } = await supabase
+                .from('lessons')
+                .select('id, title, slug, chapter_id')
+                .eq('id', progressData.lesson_id)
+                .single()
           
-          setProfile(profileData)
-      }
+                if (lessonData){
+                    const { data: chapterData } = await supabase
+                    .from('chapters')
+                    .select('title, slug')
+                    .eq('id', lessonData.chapter_id)
+                    .single()
+                
+                    setLastLesson({
+                        ...lessonData,
+                        chapter: chapterData
+                    })
+                }
+            } 
+        }
     }
 
     fetchchapters()
     }, [])
-
-    const handleMockupClick = () => {
-        if (!isAuthenticated) {
-            alert('Trebuie să fii autentificat pentru a accesa simularea de examen!');
-            navigate('/login');
-            return;
-        }
-        navigate('/lectie/simulare-sesiune-2026');
-    }
 
     return (
         <div className='min-h-screen bg-slate-950 text-slate-200 p-8 font-sans mb-12'>
 
             <UpdateAlert />
 
-            <div className="max-w-5xl mx-auto mb-20 text-center flex flex-col gap-12">
+            <div className="max-w-5xl mx-auto mb-10 text-center flex flex-col gap-12">
                 <div className="flex justify-center">
                     <img src="/logo.png" className='w-48'></img>
                 </div>
@@ -72,9 +97,31 @@ export default function Home() {
                 
             </div>
 
-            <div className="max-w-5xl mx-auto mb-10 relative overflow-hidden rounded-xl p-6 md:p-8">
-                
+            {lastLesson && (
+                <div className="max-w-5xl mx-auto mb-10 rounded-xl">
+                    <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 md:p-8">
+                        <p className="text-slate-400 mb-3">Ai rămas la lecția:</p>
+                        <h2 className="text-2xl font-bold text-white mb-2">{lastLesson.title}</h2>
+                        <p className="text-slate-400 mb-6">din capitolul <span className="text-blue-400">{lastLesson.chapter.title}</span></p>
+                        <Link 
+                            to={`/lectie/${lastLesson.slug}`}
+                            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300">
+                            Continuă lecția →
+                        </Link>
+                    </div>
+                </div>
+            )}
+
+            <div className="max-w-5xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {subjects.map((subject) => (
+                        <div key={subject.id} onClick={() => handleSubjectClick(subject)} className="cursor-pointer">
+                            <ModuleCard module={subject} />
+                        </div>
+                    ))}
+                </div>
             </div>
+            
 
         </div>
     )

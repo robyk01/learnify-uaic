@@ -6,7 +6,7 @@ import { SubjectContext } from "./SubjectContext";
 import { Home, Code, Trophy, Settings, LogOut } from "lucide-react";
 
 const Navbar = () => {
-    const { selectedSubject, setSelectedSubject, closeSubject } = useContext(SubjectContext);
+    const { selectedSubject, setSelectedSubject, closeSubject, handleSubjectClick } = useContext(SubjectContext);
     const [profile, setProfile] = useState(null)
     const [openProfile, setOpenProfile] = useState(null)
     const [subjects, setSubjects] = useState([]);
@@ -19,8 +19,6 @@ const Navbar = () => {
                 .select('id, title, shortname')
                 .eq('is_active', true);
             
-
-            console.log("Subjects fetched:", data);  {/* DEBUG */}
             console.log("Error:", error);
 
             const subjectsWithGradients = data?.map((subject, index) => ({
@@ -82,14 +80,6 @@ const Navbar = () => {
 
     }, [])
 
-    const handleSubjectClick = (subject) => {
-        if (selectedSubject?.id === subject.id) {
-            closeSubject();
-        } else {
-            setSelectedSubject(subject);
-        }
-    };
-
     const handleLogout = async () => {
         await supabase.auth.signOut()
         setProfile(null)
@@ -135,6 +125,7 @@ const Navbar = () => {
                     {/* Clasament */}
                     <NavLink
                         to="/clasament"
+                        onClick={() => setSelectedSubject(null)}
                         className={({ isActive }) => `w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
                             isActive
                                 ? "bg-gradient-to-br from-yellow-500 to-yellow-600 text-white border-white/30 shadow-lg shadow-yellow-500/50"

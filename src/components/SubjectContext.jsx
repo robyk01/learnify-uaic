@@ -14,8 +14,16 @@ export const SubjectProvider = ({ children }) => {
         }, 200);
     };
 
+    const handleSubjectClick = (subject) => {
+        if (selectedSubject?.id === subject.id) {
+            closeSubject();
+        } else {
+            setSelectedSubject(subject);
+        }
+    };
+
     return (
-        <SubjectContext.Provider value={{ selectedSubject, setSelectedSubject, isClosing, setIsClosing, closeSubject }}>
+        <SubjectContext.Provider value={{ selectedSubject, setSelectedSubject, isClosing, setIsClosing, closeSubject, handleSubjectClick }}>
             {children}
         </SubjectContext.Provider>
     );

@@ -140,12 +140,14 @@ const LessonPage = () => {
 
     const handleComplete = async () => {
         setCompleting(true)
+        setIsCompleted(true)
 
         const {data: {session}} = await supabase.auth.getSession()
 
         if (!session){
             alert("Trebuie sa fii logat!")
             setCompleting(false)
+            setIsCompleted(false)
             return
         }
 
@@ -167,8 +169,6 @@ const LessonPage = () => {
             setCompleting(false)
             return
         }
-
-        await new Promise(resolve => setTimeout(resolve, 500))
 
         // Get new level after XP update
         const {data: newProfile} = await supabase

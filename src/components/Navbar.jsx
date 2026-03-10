@@ -187,7 +187,7 @@ const Navbar = () => {
                                     </div>
 
                                     <Link 
-                                        to="/profil" 
+                                        to={`/utilizatori/${profile.username}`}
                                         onClick={() => {
                                             closeSubject();
                                             setOpenProfile(!openProfile);

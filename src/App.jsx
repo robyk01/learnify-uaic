@@ -42,7 +42,7 @@ function AppContent() {
           <Route path="/probleme/:slug" element={<ProblemPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/clasament" element={<Leaderboard />} />
-          <Route path="/profil" element={<Profile />} />
+          <Route path="/utilizatori/:username" element={<Profile />} />
           <Route path="/noutati" element={<News />} />
           <Route path="*" element={<div className="flex justify-center text-white p-10">404 - Pagina nu a fost gasita!</div>} />
         </Routes>

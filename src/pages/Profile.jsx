@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { IoPencil } from "react-icons/io5";
 import { IoMdCheckbox } from "react-icons/io";
 
 
 export default function Profile(){
+    const { username } = useParams();
     const [profile, setProfile] = useState(null)
     const [loading, setLoading] = useState(true);
     const [rank, setRank] = useState(0)
     const [finishedLessons, setFinishedLessons] = useState([])
+    const [currUserId, setCurrUserId] = useState(null)
 
     const [isEditingName, setIsEditingName] = useState(false)
     const [newName, setNewName] = useState("")
@@ -20,35 +22,49 @@ export default function Profile(){
     useEffect(() => {
         const getProfile = async () => {
             const {data: {user}} = await supabase.auth.getUser();
+            setCurrUserId(user?.id);
+            
+            let profileQuery;
 
-            if (!user) {
+            if (username){
+                profileQuery = supabase.from('profiles').select('*').eq('username', username).single();
+            } else {
+                if (!user) {
+                    setLoading(false);
+                    return; 
+                }
+                profileQuery = supabase.from('profiles').select('*').eq('id', user.id).single();
+            }
+
+            const profileResult = await profileQuery;
+            const userData = profileResult.data;
+
+            if (!userData) {
                 setLoading(false);
                 return; 
             }
-
-            const [profileResult, progressResult] = await Promise.all([
-                supabase.from('profiles').select('*').eq('id', user.id).single(),
-                supabase.from('user_progress').select('completed_at, lesson_id').eq('user_id', user.id).order('completed_at', { ascending: false})
-            ]);
-
-            const userData = profileResult.data;
-            const progressData = progressResult.data;
             
-            if (userData) {
-                setProfile(userData);
-                setNewName(userData.username)
-                
-                const { count } = await supabase
-                    .from('profiles')
-                    .select('*', { count: 'exact', head: true })
-                    .gt('xp', userData.xp);
-                setRank((count || 0) + 1);
-            }
+            setProfile(userData);
+            setNewName(userData.username)
+            
+            const { count } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .gt('xp', userData.xp);
 
+            setRank((count || 0) + 1);
+
+            const {data: progressData} = await supabase
+            .from('user_progress')
+            .select('completed_at, lesson_id')
+            .eq('user_id', userData.id)
+            .order('completed_at', { ascending: false})
+            .limit(10)
+            
             if (progressData && progressData.length > 0) {
                 const lessonIds = progressData.map(item => item.lesson_id);
 
-                const {data: lessonData, error: lessonError} = await supabase
+                const {data: lessonData} = await supabase
                 .from('lessons')
                 .select('id, title, slug, lesson_type')
                 .in('id', lessonIds)
@@ -67,7 +83,7 @@ export default function Profile(){
             }
 
             setLoading(false);
-        };
+            };
             
         getProfile();
 
@@ -152,14 +168,16 @@ export default function Profile(){
                         {!isEditingName ? (
                             <div className="text-xl font-medium text-white flex justify-between items-center">
                                 <span>{profile?.username}</span>
-                                <button 
-                                    onClick={() => {
-                                        setIsEditingName(true);
-                                        setError("");
-                                    }}
-                                    className="text-slate-400 hover:text-white transition-colors">
-                                    <IoPencil />
-                                </button>
+                                {currUserId === profile?.id && (
+                                    <button 
+                                        onClick={() => {
+                                            setIsEditingName(true);
+                                            setError("");
+                                        }}
+                                        className="text-slate-400 hover:text-white transition-colors">
+                                        <IoPencil />
+                                    </button>
+                                )}
                             </div>
                         ) : (
                             <div className="flex flex-col gap-2">
@@ -227,7 +245,7 @@ export default function Profile(){
                                 <Link 
                                     to={to}
                                     key={index}
-                                    className="py-3 px-4 border border-slate-700 rounded-xl transition-all hover:border-slate-600 hover:bg-slate-800/50">
+                                    className="text-sm py-3 px-4 border border-slate-800 rounded-lg transition-all hover:border-slate-600 hover:bg-slate-800/50">
                                         {item?.lessons?.title}
                                 </Link>
                                 )

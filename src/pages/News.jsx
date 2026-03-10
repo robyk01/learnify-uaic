@@ -31,9 +31,9 @@ export default function News() {
                     <p className='text-slate-400'>Rămâi la curent cu ultimele actualizări</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 grid-rows-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 grid-rows-1 md:grid-rows-3 gap-4">
 
-                    <div className="mb-8 bg-gradient-to-r from-blue-600/20 to-blue-500/10 border border-blue-500/30 p-6 rounded-lg flex gap-6 items-center h-full">
+                    <div className="mb-8 bg-gradient-to-r from-blue-600/20 to-blue-500/10 border border-blue-500/30 p-6 rounded-lg flex flex-col md:flex-row gap-6 items-center h-full">
                         <img src="/addtohome.PNG" className='w-48 rounded-lg flex-shrink-0'></img>
                         <div className='pr-8'>
                             <h2 className="text-xl font-bold text-white mb-4">Instalează aplicația pe ecranul principal</h2>
@@ -49,11 +49,11 @@ export default function News() {
                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/20 rounded-full blur-xl"></div>
                         <div className="absolute -bottom-32 left-12 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl"></div>
 
-                        <div className="flex flex-col items-start mb-2 w-[50%]">
+                        <div className="flex flex-col items-start mb-2 w-full md:w-[50%]">
                             <h3 className="font-semibold text-white">Meniu și progres refăcut</h3>
                             <span className="text-xs text-slate-500">8 Mar</span>
                         </div>
-                        <p className="text-sm text-slate-400 w-[50%]">Meniul materiilor se află în partea stângă, iar pe prima pagină poți vedea exact unde ai ajuns cu învățatul. Noul design îți oferă o navigare mai ușoară și acces rapid la lecțiile în progres.</p>
+                        <p className="text-sm text-slate-400 w-full md:w-[50%]">Meniul materiilor se află în partea stângă, iar pe prima pagină poți vedea exact unde ai ajuns cu învățatul. Noul design îți oferă o navigare mai ușoară și acces rapid la lecțiile în progres.</p>
                     </div>
                 </div>
 

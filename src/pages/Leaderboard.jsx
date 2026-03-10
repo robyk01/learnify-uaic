@@ -76,7 +76,7 @@ export default function Leaderboard() {
                             const topThree = index < 3
 
                             return(
-                                <div key={user.id}
+                                <Link to={`/utilizatori/${user.username}`} key={user.id}
                                     className={`grid grid-cols-12 gap-4 p-4 items-center transition-all duration-200
                                                 ${index === 0 ? "bg-yellow-500/30 border-yellow-500" : 
                                                 index === 1 ? "bg-slate-400/40 border-slate-700" : 
@@ -103,7 +103,7 @@ export default function Leaderboard() {
                                         </span>
                                         <span className="text-xs text-slate-400 ml-2">XP</span>
                                     </div>
-                                </div>
+                                </Link>
                             )
                         })}
 

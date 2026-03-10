@@ -211,7 +211,15 @@ export default function Profile(){
         <div className='min-h-screen text-slate-200 p-8 font-sans'>
             <div className="flex flex-col gap-8 md:gap-12 max-w-5xl mx-auto">
 
-                <aside className="flex items-center w-full border border-slate-800 bg-slate-900 p-8 rounded gap-8">
+                <aside className={`flex flex-col md:flex-row items-center w-full border p-8 rounded gap-8 ${
+                    profile?.badges.includes("s1_champion")
+                        ? "border-yellow-400 bg-gradient-to-br from-yellow-400/20 via-slate-900 to-yellow-400/20 shadow-lg shadow-yellow-400/20" 
+                        : profile?.badges?.includes("s1_top10")
+                        ? "border-blue-400 bg-gradient-to-br from-blue-400/20 via-slate-900 to-blue-400/20 shadow-lg shadow-blue-400/20"
+                        : profile?.badges?.includes("s1_early")
+                        ? "border-slate-800 bg-gradient-to-br from-purple-400/10 via-slate-900 to-purple-400/10 shadow-lg shadow-purple-400/10"
+                        : "bg-slate-900 border-slate-800"
+                }`}>
 
                     {/* Profile Photo */}
                     <div className="relative w-24 h-24 rounded-full bg-white flex items-center justify-center mb-4 text-2xl font-bold text-slate-900 overflow-hidden">
@@ -304,27 +312,29 @@ export default function Profile(){
                     </div>
 
                     {/* Badges */}
-                    <div className="flex flex-col  ml-auto items-center gap-6">
+                    <div className="flex flex-col ml-auto w-full md:w-[50%] items-center gap-6">
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wide">Realizări</h3>
-                        <div className="flex gap-4">
+                        <div className="flex w-full gap-3 justify-around px-4 py-6 bg-black/20 rounded-3xl">
                         {profile?.badges?.map((badge) => {
                             const badgeConfig = {
-                                s1_champion: { src: "/s1_champion.png", label: "Campion Sezon 1", alt: "Champion" },
-                                s1_top10: { src: "/s1_top10.png", label: "Top 10 Sezon 1", alt: "Top 10" },
-                                s1_early: { src: "/s1_early.png", label: "Utilizator timpuriu", alt: "Early" },
+                                s1_champion: { src: "/s1_champion.png", label: "Top 1", alt: "Champion" },
+                                s1_top10: { src: "/s1_top10.png", label: "Top 10", alt: "Top 10" },
+                                s1_early: { src: "/s1_early.png", label: "Early Bird", alt: "Early" },
                             };
 
                             const config = badgeConfig[badge];
                             if (!config) return null;
 
                             return (
-                                <div key={badge} className="flex flex-col items-center gap-2 transition-transform ">
+                                <div key={badge} className="flex flex-col items-center gap-2">
                                     <img 
                                         src={config.src} 
                                         alt={config.alt} 
-                                        className="w-16 h-16 rounded-lg transition-all hover:scale-110"
+                                        className="w-16 h-16 rounded-lg shadow-lg"
                                     />
-                                    <span className="text-xs text-slate-400 text-center font-medium">{config.label}</span>
+                                    <span className="text-xs text-slate-400 text-center font-medium whitespace-nowrap">
+                                        {config.label}
+                                    </span>
                                 </div>
                             );
                         })}

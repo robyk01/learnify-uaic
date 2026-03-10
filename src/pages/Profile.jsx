@@ -19,6 +19,8 @@ export default function Profile(){
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState("")
 
+    const [uploadingAvatar, setUploadingAvatar] = useState(false)
+
     useEffect(() => {
         const getProfile = async () => {
             const {data: {user}} = await supabase.auth.getUser();
@@ -150,6 +152,43 @@ export default function Profile(){
         setIsEditingName(false);
     };
 
+    const handleAvatarUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingAvatar(true);
+
+        try {
+            const uploadPath = currUserId;
+
+            if (profile?.avatar_url){
+                await supabase.storage.from('avatars').remove(uploadPath);
+            }
+
+            const {error: uploadError} = await supabase.storage
+            .from('avatars')
+            .upload(uploadPath, file, {upsert: true});
+
+            if (uploadError) throw uploadError
+
+            const {data} = supabase.storage.from('avatars').getPublicUrl(uploadPath);
+
+            const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ avatar_url: data.publicUrl })
+            .eq('id', currUserId);
+
+            if (updateError) throw updateError;
+
+            setProfile({ ...profile, avatar_url: data.publicUrl });
+            setAvatarUrl(data.publicUrl);
+        } catch (error) {
+            console.error("Avatar upload error: ", error)
+        } finally {
+            setUploadingAvatar(false);
+        }
+    }
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen bg-slate-950">
@@ -163,7 +202,27 @@ export default function Profile(){
             <div className="flex flex-col md:flex-row gap-8 md:gap-12 max-w-5xl mx-auto">
 
                 <aside className="flex flex-col w-full md:w-64 h-fit border border-slate-800 bg-slate-900 p-6 rounded">
-                    <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-4 text-2xl font-bold text-slate-900">{profile?.username?.[0].toUpperCase()}</div>
+
+                    <div className="relative w-24 h-24 rounded-full bg-white flex items-center justify-center mb-4 text-2xl font-bold text-slate-900 overflow-hidden">
+                        {profile?.avatar_url ? (
+                            <img src={profile?.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                            profile?.username?.[0].toUpperCase()
+                        )}
+                        {currUserId === profile?.id && (
+                            <label className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition">
+                                <input 
+                                    type="file" 
+                                    accept="image/jpeg,image/png,image/webp" 
+                                    onChange={handleAvatarUpload}
+                                    disabled={uploadingAvatar}
+                                    className="hidden" 
+                                />
+                                <span className="text-white text-xs">Schimbă</span>
+                            </label>
+                        )}
+                    </div>
+
                     <div className="mb-1">
                         {!isEditingName ? (
                             <div className="text-xl font-medium text-white flex justify-between items-center">

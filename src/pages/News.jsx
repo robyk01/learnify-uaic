@@ -44,17 +44,39 @@ export default function News() {
                         </div>
                     </div>
 
-                    <div className="relative flex flex-col items-center justify-center border border-slate-800 p-8 rounded-lg flex-1 overflow-hidden">
+                    <div className="flex flex-col gap-4">
+                        <div className="relative flex flex-col items-center justify-center border border-slate-800 p-8 rounded-lg flex-1 overflow-hidden">
+                            <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/20 rounded-full blur-xl"></div>
 
-                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/20 rounded-full blur-xl"></div>
-                        <div className="absolute -bottom-32 left-12 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl"></div>
-
-                        <div className="flex flex-col items-start mb-2 w-full md:w-[50%]">
-                            <h3 className="font-semibold text-white">Meniu și progres refăcut</h3>
-                            <span className="text-xs text-slate-500">8 Mar</span>
+                            <div className="flex flex-col items-start mb-2 w-full md:w-[50%]">
+                                <h3 className="font-semibold text-white">Fotografie de profil</h3>
+                                <span className="text-xs text-slate-500">10 Mar</span>
+                            </div>
+                            <p className="text-sm text-slate-400 w-full md:w-[50%]">Poți acum să-ți personalizezi profilul cu o fotografie. Hover peste avatar-ul tău și apasă "Schimbă" pentru a-ți încărca o imagine.</p>
                         </div>
-                        <p className="text-sm text-slate-400 w-full md:w-[50%]">Meniul materiilor se află în partea stângă, iar pe prima pagină poți vedea exact unde ai ajuns cu învățatul. Noul design îți oferă o navigare mai ușoară și acces rapid la lecțiile în progres.</p>
+
+                        <div className="relative flex flex-col items-center justify-center border border-slate-800 p-8 rounded-lg flex-1 overflow-hidden">
+                            
+                            <div className="flex flex-col items-start mb-2 w-full md:w-[50%]">
+                                <h3 className="font-semibold text-white">Profiluri publice</h3>
+                                <span className="text-xs text-slate-500">10 Mar</span>
+                            </div>
+                            <p className="text-sm text-slate-400 w-full md:w-[50%]">Poți acum vedea profilurile altor utilizatori din clasament. Vizionează progresul și lecțiile finalizate de alți studenți și compară-te cu ei!</p>
+                        </div>
+
+                        <div className="relative flex flex-col items-center justify-center border border-slate-800 p-8 rounded-lg flex-1 overflow-hidden">
+
+                            <div className="absolute -bottom-32 left-12 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl"></div>
+
+                            <div className="flex flex-col items-start mb-2 w-full md:w-[50%]">
+                                <h3 className="font-semibold text-white">Meniu și progres refăcut</h3>
+                                <span className="text-xs text-slate-500">8 Mar</span>
+                            </div>
+                            <p className="text-sm text-slate-400 w-full md:w-[50%]">Meniul materiilor se află în partea stângă, iar pe prima pagină poți vedea exact unde ai ajuns cu învățatul. Noul design îți oferă o navigare mai ușoară și acces rapid la lecțiile în progres.</p>
+                        </div>
+                        
                     </div>
+                    
                 </div>
 
                

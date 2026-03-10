@@ -93,8 +93,21 @@ export default function Leaderboard() {
                                          index + 1}
                                     </div>
 
-                                    <div className="col-span-7 flex items-center gap-3">
-                                        {user.username}
+                                    <div className="col-span-7 flex items-center gap-4">
+                                        <div className="flex-shrink-0">
+                                            {user.avatar_url ? (
+                                                <img 
+                                                    src={user.avatar_url} 
+                                                    alt={user.username}
+                                                    className="w-12 h-12 rounded-full border-2 border-white/20 object-cover flex-shrink-0"
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-sm font-bold text-slate-900 flex-shrink-0">
+                                                    {user.username?.[0].toUpperCase()}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <span className="truncate">{user.username}</span>
                                     </div>
 
                                     <div className="col-span-3 text-right pr-4">

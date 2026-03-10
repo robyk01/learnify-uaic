@@ -167,10 +167,22 @@ const Navbar = () => {
                     {/* Profile */}
                     {profile ? (
                         <div className="relative">
-                            <button onClick={() => setOpenProfile(!openProfile)}
+                            
+                            {profile?.avatar_url ? (
+                                <button onClick={() => setOpenProfile(!openProfile)}>
+                                    <img 
+                                        src={profile?.avatar_url} 
+                                        alt={profile?.username}
+                                        className="w-14 h-14 rounded-full border-2 border-white/20 object-cover"
+                                    />
+                                </button>
+                            ) : (
+                                <button onClick={() => setOpenProfile(!openProfile)}
                                     className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-white font-bold backdrop-blur-md border border-slate-600/50 hover:border-white/30 transition-all duration-300 hover:shadow-lg">
                                         {profile?.username?.[0].toUpperCase()}
-                            </button>
+                                        
+                                </button>
+                            )}
                             
                             {openProfile && (
                                 <div className="absolute left-20 bottom-0 mb-2 w-48 p-2 bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl animate-in fade-in slide-in-from-left-2 duration-200">

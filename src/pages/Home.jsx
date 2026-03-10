@@ -126,21 +126,29 @@ export default function Home() {
             <div className="max-w-5xl mx-auto mt-20 pt-10 mb-20 border-t border-slate-800">
                 <h2 className="text-2xl font-bold text-white mb-4">Noutăți</h2>
                 <div className="space-y-4">
-                    <div className="border border-slate-800 p-4 rounded-lg ">
+                    <Link to="/noutati" className="block border border-slate-800 p-4 rounded-lg ">
                         <div className="flex items-start justify-between mb-2">
-                            <h3 className="font-semibold text-white">Meniu complet refăcut</h3>
+                            <h3 className="font-semibold text-white text-sm">Avatar profil</h3>
+                            <span className="text-xs text-slate-500">10 Mar</span>
+                        </div>
+                        <p className="text-sm text-slate-400">Acum îți poți schimba poza de la cont prin hover pe poza de pe profil si "Schimbă".</p>
+                    </Link>
+
+                    <Link to="/noutati" className="block border border-slate-800 p-4 rounded-lg ">
+                        <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-white text-sm">Profiluri publice</h3>
+                            <span className="text-xs text-slate-500">10 Mar</span>
+                        </div>
+                        <p className="text-sm text-slate-400">Acum poți vedea profilurile altor utilizatori din clasament.</p>
+                    </Link>
+
+                    <Link to="/noutati" className="block border border-slate-800 p-4 rounded-lg ">
+                        <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-white text-sm">Meniu complet refăcut</h3>
                             <span className="text-xs text-slate-500">8 Mar</span>
                         </div>
                         <p className="text-sm text-slate-400">Meniul materiilor se află în partea stângă. Click pe o materie să vezi cursurile.</p>
-                    </div>
-
-                    <div className="border border-slate-800 p-4 rounded-lg ">
-                        <div className="flex items-start justify-between mb-2">
-                            <h3 className="font-semibold text-white">Adăugat ultimul progres</h3>
-                            <span className="text-xs text-slate-500">8 Mar</span>
-                        </div>
-                        <p className="text-sm text-slate-400">Pe prima pagina poți să vezi unde ai ajuns cu învățatul.</p>
-                    </div>
+                    </Link>
 
                     <div className="mt-6 pt-4">
                         <Link to="/noutati" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition">

@@ -156,20 +156,31 @@ export default function Profile(){
         const file = e.target.files?.[0];
         if (!file) return;
 
+        const MAX_SIZE = 2 * 1024 * 1024;
+        if (file.size > MAX_SIZE) {
+            setError("Avatar trebuie să fie mai mic de 2MB");
+            return;
+        }
+
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+            setError("Format de imagine neacceptat");
+            return;
+        }
+
         setUploadingAvatar(true);
 
         try {
             const uploadPath = currUserId;
-
-            if (profile?.avatar_url){
-                await supabase.storage.from('avatars').remove(uploadPath);
-            }
 
             const {error: uploadError} = await supabase.storage
             .from('avatars')
             .upload(uploadPath, file, {upsert: true});
 
             if (uploadError) throw uploadError
+
+            if (profile?.avatar_url){
+                await supabase.storage.from('avatars').remove(uploadPath);
+            }
 
             const {data} = supabase.storage.from('avatars').getPublicUrl(uploadPath);
 
@@ -181,7 +192,6 @@ export default function Profile(){
             if (updateError) throw updateError;
 
             setProfile({ ...profile, avatar_url: data.publicUrl });
-            setAvatarUrl(data.publicUrl);
         } catch (error) {
             console.error("Avatar upload error: ", error)
         } finally {
@@ -199,10 +209,11 @@ export default function Profile(){
 
     return(
         <div className='min-h-screen text-slate-200 p-8 font-sans'>
-            <div className="flex flex-col md:flex-row gap-8 md:gap-12 max-w-5xl mx-auto">
+            <div className="flex flex-col gap-8 md:gap-12 max-w-5xl mx-auto">
 
-                <aside className="flex flex-col w-full md:w-64 h-fit border border-slate-800 bg-slate-900 p-6 rounded">
+                <aside className="flex items-center w-full border border-slate-800 bg-slate-900 p-8 rounded gap-8">
 
+                    {/* Profile Photo */}
                     <div className="relative w-24 h-24 rounded-full bg-white flex items-center justify-center mb-4 text-2xl font-bold text-slate-900 overflow-hidden">
                         {profile?.avatar_url ? (
                             <img src={profile?.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
@@ -222,8 +233,11 @@ export default function Profile(){
                             </label>
                         )}
                     </div>
-
+                    
+                    {/* Profile Details */}
                     <div className="mb-1">
+
+                        {/* Name */}
                         {!isEditingName ? (
                             <div className="text-xl font-medium text-white flex justify-between items-center">
                                 <span>{profile?.username}</span>
@@ -277,20 +291,51 @@ export default function Profile(){
                                 </div>
                             </div>
                         )}
+
+                        <div className="flex gap-1 mb-2 items-center">
+                            <div className="text-slate-400">Clasament:</div>
+                            <div className="">#{rank}</div>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3 py-2 text-slate-300 hover:text-white text-nowrap ">
+                            <span className="text-sm font-bold text-slate-400">Nivel: {profile?.level}</span>
+                            <span className="font-bold text-blue-400 font-mono">{profile?.xp} XP</span>
+                        </div>
                     </div>
 
-                    <div className="flex gap-1 mb-2 items-center">
-                        <div className="text-slate-400">Clasament:</div>
-                        <div className="">#{rank}</div>
-                    </div>
+                    {/* Badges */}
+                    <div className="flex flex-col  ml-auto items-center gap-6">
+                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wide">Realizări</h3>
+                        <div className="flex gap-4">
+                        {profile?.badges?.map((badge) => {
+                            const badgeConfig = {
+                                s1_champion: { src: "/s1_champion.png", label: "Campion Sezon 1", alt: "Champion" },
+                                s1_top10: { src: "/s1_top10.png", label: "Top 10 Sezon 1", alt: "Top 10" },
+                                s1_early: { src: "/s1_early.png", label: "Utilizator timpuriu", alt: "Early" },
+                            };
 
-                    <div className="flex items-center justify-between gap-3 py-2 text-slate-300 hover:text-white text-nowrap ">
-                        <span className="text-sm font-bold text-slate-400">Nivel: {profile?.level}</span>
-                        <span className="font-bold text-blue-400 font-mono">{profile?.xp} XP</span>
+                            const config = badgeConfig[badge];
+                            if (!config) return null;
+
+                            return (
+                                <div key={badge} className="flex flex-col items-center gap-2 transition-transform ">
+                                    <img 
+                                        src={config.src} 
+                                        alt={config.alt} 
+                                        className="w-16 h-16 rounded-lg transition-all hover:scale-110"
+                                    />
+                                    <span className="text-xs text-slate-400 text-center font-medium">{config.label}</span>
+                                </div>
+                            );
+                        })}
                     </div>
+                    {(!profile?.badges || profile.badges.length === 0) && (
+                        <p className="text-slate-500 text-sm italic">Nicio realizare încă</p>
+                    )}
+                </div>
                 </aside>
 
-                <main className="flex-1 bg-slate-900 p-6 rounded border border-slate-800">
+                <main className="bg-slate-900 p-6 rounded border border-slate-800">
                     <h2 className="text-2xl font-medium mb-6 text-white">Lecții finalizate</h2>
 
                     {finishedLessons.length === 0 ? (

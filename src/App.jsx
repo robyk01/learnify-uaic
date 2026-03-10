@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { SubjectProvider } from "./components/SubjectContext";
 import Home from "./pages/Home";
 import ModulePage from "./pages/ModulePage";
@@ -12,9 +13,15 @@ import Profile from "./pages/Profile";
 import ProblemList from "./pages/ProblemList";
 import ProblemPage from "./pages/ProblemPage";
 import Footer from "./components/Footer"
+import News from "./pages/News";
 
 function AppContent() {
   const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const hideFooter = location.pathname.startsWith('/lectie/') || 
                      location.pathname.startsWith('/probleme/');
 
@@ -36,7 +43,8 @@ function AppContent() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/clasament" element={<Leaderboard />} />
           <Route path="/profil" element={<Profile />} />
-          <Route path="*" element={<div className="text-white p-10">404 - Pagina nu a fost gasita!</div>} />
+          <Route path="/noutati" element={<News />} />
+          <Route path="*" element={<div className="flex justify-center text-white p-10">404 - Pagina nu a fost gasita!</div>} />
         </Routes>
       </main>
       

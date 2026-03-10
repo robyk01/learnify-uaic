@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { supabase } from "../supabaseClient";
+import { SubjectContext } from "../components/SubjectContext";
 
 import { IoBookOutline } from "react-icons/io5"; 
 import { HiPuzzlePiece } from "react-icons/hi2"; 
@@ -12,7 +13,7 @@ const ModulePage = () => {
     const [module, setModule] = useState(null);
     const [loading, setLoading] = useState(true);
     const [completedLessons, setCompletedLessons] = useState(new Set());
-
+    const {navOpen} = useContext(SubjectContext)
 
     useEffect(() => {
         const fetchModuleAndLessons = async () => {
@@ -101,7 +102,7 @@ const ModulePage = () => {
     }
 
     return(
-        <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
+        <div className={`min-h-screen bg-slate-950 text-slate-200 p-8 transition-all ${navOpen && 'ml-[200px]'}`}>
             <div className="max-w-5xl mx-auto">
 
                 {/* Back */}

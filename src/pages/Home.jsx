@@ -141,6 +141,12 @@ export default function Home() {
                         </div>
                         <p className="text-sm text-slate-400">Pe prima pagina poți să vezi unde ai ajuns cu învățatul.</p>
                     </div>
+
+                    <div className="mt-6 pt-4">
+                        <Link to="/noutati" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition">
+                            Vezi mai multe
+                        </Link>
+                    </div>
                 </div>
 
             </div>

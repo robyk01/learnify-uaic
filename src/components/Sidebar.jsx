@@ -55,7 +55,7 @@ const SidebarMenu = () => {
 
     if (loading) {
         return (
-            <aside className={`w-[80%] md:w-80 h-screen bg-slate-900 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
+            <aside className={`w-[80%] md:w-80 h-screen bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
                 <div className="p-6 space-y-4">
                     <div className="h-8 bg-slate-700 rounded w-3/4"></div>
                 </div>
@@ -67,7 +67,7 @@ const SidebarMenu = () => {
         <aside className={`w-[80%] md:w-80 h-screen bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
             
             <div className="p-6 border-b border-slate-700/50 flex-shrink-0 flex justify-between items-start">
-                <div>
+                <div className="w-[80%]">
                     <h2 className="text-xl font-bold text-white">{selectedSubject.title}</h2>
                     <p className="text-xs text-slate-400 mt-2">Capitole</p>
                 </div>

@@ -6,12 +6,10 @@ import { SubjectContext } from "./SubjectContext";
 import { Home, Code, Trophy, Settings, LogOut, Menu, X } from "lucide-react";
 
 const Navbar = () => {
-    const { selectedSubject, setSelectedSubject, closeSubject, handleSubjectClick } = useContext(SubjectContext);
+    const { selectedSubject, setSelectedSubject, closeSubject, handleSubjectClick, navOpen, setNavOpen } = useContext(SubjectContext);
     const [profile, setProfile] = useState(null)
     const [openProfile, setOpenProfile] = useState(null)
     const [subjects, setSubjects] = useState([]);
-    const [navOpen, setNavOpen] = useState(false)
-
 
     const imgUrls = [
         "/so_bg.png", "/pa_bg.png", "/oop_bg.png"
@@ -92,8 +90,11 @@ const Navbar = () => {
             {/* Mobile Menu Button */}
             <button
                 onClick={() => {
-                    setNavOpen(!navOpen)
-                    setSelectedSubject(!selectedSubject)
+                    if (navOpen) {
+                        closeSubject();
+                    } else {
+                        setNavOpen(true);
+                    }
                 }}
                 className="fixed top-6 right-6 z-50 md:hidden p-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white hover:bg-slate-700 transition">
                 {navOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -109,6 +110,7 @@ const Navbar = () => {
                         onClick={() => {
                             setSelectedSubject(null)
                             setNavOpen(false)
+                            setOpenProfile(false)
                         }}
                         className="w-16 h-16 rounded-3xl bg-gradient-to-br from-white to-white flex items-center justify-center text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 backdrop-blur-md border border-blue-400/30">
                         <img src="/icon_blue.png" alt="Logo" className="h-8" />
@@ -143,7 +145,7 @@ const Navbar = () => {
                     ))}
                 </div>
 
-                {/* Profile */}
+                
                 <div className="flex flex-col items-center gap-6">
                     <div className="w-12 h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
                     
@@ -161,7 +163,8 @@ const Navbar = () => {
                         }`}>
                         <Trophy className="h-6 w-6" />
                     </NavLink>
-
+                    
+                    {/* Profile */}
                     {profile ? (
                         <div className="relative">
                             <button onClick={() => setOpenProfile(!openProfile)}
@@ -185,6 +188,10 @@ const Navbar = () => {
 
                                     <Link 
                                         to="/profil" 
+                                        onClick={() => {
+                                            closeSubject();
+                                            setOpenProfile(!openProfile);
+                                        }}
                                         className="flex items-center gap-2 w-full px-2 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition mb-2">
                                         <Settings className="h-4 w-4" />
                                         Setări

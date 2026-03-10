@@ -1,8 +1,9 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { supabase } from "../supabaseClient";
 import { Quiz } from "../components/Quiz"
 import { LevelUpNotification } from "../components/LevelUpNotification";
+import { SubjectContext } from "../components/SubjectContext";
 
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
@@ -23,6 +24,7 @@ const LessonPage = () => {
     const [loading, setLoading] = useState(true) 
     const [parent, setParent] = useState(null)
     const [nextLesson, setNextLesson] = useState(null)
+    const {navOpen} = useContext(SubjectContext)
 
     const [completing, setCompleting] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
@@ -215,7 +217,7 @@ const LessonPage = () => {
     if (!lesson) return <div className="text-white p-8">Lectia nu a fost gasita</div>
 
     return(
-        <div className="min-h-screen bg-slate-950 text-slate-200 p-6">
+        <div className={`min-h-screen bg-slate-950 text-slate-200 p-8 transition-all ${navOpen && 'ml-[200px]'}`}>
             {/* Level Up Notification */}
             {showLevelUp && (
                 <LevelUpNotification 

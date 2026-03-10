@@ -5,12 +5,14 @@ export const SubjectContext = createContext();
 export const SubjectProvider = ({ children }) => {
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
+    const [navOpen, setNavOpen] = useState(false);
 
     const closeSubject = () => {
         setIsClosing(true);
         setTimeout(() => {
             setSelectedSubject(null);
             setIsClosing(false);
+            setNavOpen(false);
         }, 200);
     };
 
@@ -19,11 +21,12 @@ export const SubjectProvider = ({ children }) => {
             closeSubject();
         } else {
             setSelectedSubject(subject);
+            setNavOpen(true);
         }
     };
 
     return (
-        <SubjectContext.Provider value={{ selectedSubject, setSelectedSubject, isClosing, setIsClosing, closeSubject, handleSubjectClick }}>
+        <SubjectContext.Provider value={{ selectedSubject, setSelectedSubject, isClosing, setIsClosing, closeSubject, handleSubjectClick, navOpen, setNavOpen }}>
             {children}
         </SubjectContext.Provider>
     );

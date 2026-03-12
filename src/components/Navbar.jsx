@@ -8,9 +8,12 @@ import { Home, Book, Compass, Trophy, Settings, LogOut, User, X } from "lucide-r
 
 const Navbar = () => {
     const { subjects, selectedSubject, setSelectedSubject, closeSubject, handleSubjectClick} = useContext(SubjectContext);
+
     const [profile, setProfile] = useState(null)
     const [openProfile, setOpenProfile] = useState(null)
+
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const [isClosingMobile, setIsClosingMobile] = useState(false)
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -52,6 +55,9 @@ const Navbar = () => {
         })
         .subscribe()
 
+        setIsMobileOpen(false);
+        setIsClosingMobile(false);
+
         return () => {
             authListener.unsubscribe()
             supabase.removeChannel(channel)
@@ -64,10 +70,16 @@ const Navbar = () => {
         setProfile(null)
     }
 
-    const closeMobile = () => (setIsMobileOpen(false))
+    const closeMobile = () => {
+        setIsClosingMobile(true);
+        setTimeout(() => {
+            setIsMobileOpen(false);
+            setIsClosingMobile(false)
+        }, 300);
+    }
     
-    const navLinkClass = ({ isActive }) => 
-  `flex-1 p-2 m-2 rounded-2xl transition-all ${isActive && !isMobileOpen ? "text-white bg-slate-800" : ""}`;
+    const navLinkClass = ({ isActive, isMobileOpen: menuOpen }) => 
+    `flex-1 p-2 m-2 rounded-2xl transition-all ${isActive && !menuOpen ? "text-white bg-slate-800" : ""}`;
 
     return(
         <>
@@ -202,12 +214,12 @@ const Navbar = () => {
 
             {/* Mobile Menu Bottom */}
             
-            <div className="w-[90%] fixed bottom-3 left-[50%] -translate-x-[50%] bg-black/30 glass-nav rounded-3xl border-t border-slate-700 z-10">
+            <div className={`w-[90%] fixed bottom-3 left-[50%] -translate-x-[50%] bg-black/30 glass-nav rounded-3xl border-t border-slate-700 z-50`}>
                 <ul className="flex justify-around md:hidden lg:hidden list-none text-slate-400 text-xs font-medium cursor-pointer">
                     <NavLink
                         to="/"
                         onClick={closeMobile}
-                        className={navLinkClass}>
+                        className={({ isActive }) => navLinkClass({ isActive, isMobileOpen })}>
                         <div className="flex flex-col items-center gap-1">
                             <Home className="h-5 w-5" />
                             <span>Acasă</span>
@@ -215,7 +227,7 @@ const Navbar = () => {
                     </NavLink>
 
                     <button
-                        onClick={() => setIsMobileOpen((p) => !p)}
+                        onClick={() => isMobileOpen ? closeMobile() : setIsMobileOpen(true)}
                         to="/cursuri"
                         className={navLinkClass({ isActive: isMobileOpen })}>
                         <div className="flex flex-col items-center gap-1">
@@ -227,7 +239,7 @@ const Navbar = () => {
                     <NavLink
                         to="/feed"
                         onClick={closeMobile}
-                        className={navLinkClass}>
+                        className={({ isActive }) => navLinkClass({ isActive, isMobileOpen })}>
                             <div className="flex flex-col items-center gap-1">
                                 <Compass className="h-5 w-5" />
                                 <span>Feed</span>
@@ -237,7 +249,7 @@ const Navbar = () => {
                     <NavLink
                         to="/clasament"
                         onClick={closeMobile}
-                        className={navLinkClass}>
+                        className={({ isActive }) => navLinkClass({ isActive, isMobileOpen })}>
                             <div className="flex flex-col items-center gap-1">
                                 <Trophy className="h-5 w-5" />
                                 <span>Clasament</span>
@@ -247,7 +259,7 @@ const Navbar = () => {
                     <NavLink
                         to={`${profile ? `/utilizatori/${profile?.username}` : '/login'}`}
                         onClick={closeMobile}
-                        className={navLinkClass}>
+                        className={({ isActive }) => navLinkClass({ isActive, isMobileOpen })}>
                             <div className="flex flex-col items-center gap-1">
                                 <User className="h-5 w-5" />
                                 <span>Profil</span>
@@ -257,8 +269,8 @@ const Navbar = () => {
             </div>
 
             <div className="block md:hidden">
-                {isMobileOpen && (
-                    <MobileMenu onClose={closeMobile} />
+                {(isMobileOpen || isClosingMobile) && (
+                    <MobileMenu closeMobile={closeMobile} isOpen={isMobileOpen && !isClosingMobile}/>
                 )}
             </div>
         </>

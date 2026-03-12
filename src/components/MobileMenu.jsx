@@ -2,11 +2,15 @@ import { useContext, useState } from "react";
 import { SubjectContext } from "./SubjectContext";
 import { NavLink } from "react-router-dom";
 
-export default function MobileMenu( {onClose} ){
+export default function MobileMenu( {closeMobile, isOpen} ){
     const { subjects, chapters, selectedSubject, setSelectedSubject, handleSubjectClick } = useContext(SubjectContext)
 
     return(
-        <div className="fixed inset-0 m-5 bg-slate-950/80 border border-slate-800 rounded-xl glass-nav flex flex-col">
+         <div className={`fixed inset-0 m-5 bg-slate-950/80 z-20 border border-slate-800 rounded-xl glass-nav flex flex-col
+            ${isOpen 
+                ? 'animate-in fade-in slide-in-from-bottom-10 duration-300' 
+                : 'animate-out fade-out slide-out-to-bottom-10 duration-300'
+            }`}>
 
             {/* Tabs */}
             <div className="flex border-b border-slate-800 flex-shrink-0 rounded-tl-xl rounded-tr-xl overflow-hidden">
@@ -34,7 +38,7 @@ export default function MobileMenu( {onClose} ){
                             <NavLink
                                 key={chapter.id}
                                 to={`/capitol/${chapter.slug}`}
-                                onClick={onClose}
+                                onClick={closeMobile}
                                 className={({ isActive }) =>
                                     `block w-full p-3 rounded-lg text-sm font-semibold transition ${
                                         isActive

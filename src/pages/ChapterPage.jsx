@@ -13,7 +13,7 @@ const ModulePage = () => {
     const [module, setModule] = useState(null);
     const [loading, setLoading] = useState(true);
     const [completedLessons, setCompletedLessons] = useState(new Set());
-    const {navOpen} = useContext(SubjectContext)
+    const {selectedSubject, isClosing} = useContext(SubjectContext)
 
     useEffect(() => {
         const fetchModuleAndLessons = async () => {
@@ -102,7 +102,7 @@ const ModulePage = () => {
     }
 
     return(
-        <div className={`min-h-screen bg-slate-950 text-slate-200 p-8 transition-all ${navOpen && 'ml-[200px]'}`}>
+        <div className={`min-h-screen bg-slate-950 text-slate-200 p-8 transition-all duration-200 ${selectedSubject && !isClosing && 'md:pl-[25%]'}`}>
             <div className="max-w-5xl mx-auto">
 
                 {/* Back */}

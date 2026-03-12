@@ -2,36 +2,17 @@ import { useEffect, useState, useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { SubjectContext } from "./SubjectContext";
+import MobileMenu from "./MobileMenu";
 
-import { Home, Code, Trophy, Settings, LogOut, Menu, X } from "lucide-react";
+import { Home, Book, Compass, Trophy, Settings, LogOut, User, X } from "lucide-react";
 
 const Navbar = () => {
-    const { selectedSubject, setSelectedSubject, closeSubject, handleSubjectClick, navOpen, setNavOpen } = useContext(SubjectContext);
+    const { subjects, selectedSubject, setSelectedSubject, closeSubject, handleSubjectClick} = useContext(SubjectContext);
     const [profile, setProfile] = useState(null)
     const [openProfile, setOpenProfile] = useState(null)
-    const [subjects, setSubjects] = useState([]);
-
-    const imgUrls = [
-        "/so_bg.png", "/pa_bg.png", "/oop_bg.png"
-    ];
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     useEffect(() => {
-        const fetchSubjects = async () => {
-            const { data, error } = await supabase
-                .from('subjects')
-                .select('id, title, shortname')
-                .eq('is_active', true);
-            
-            console.log("Error:", error);
-
-            const subjectsWithGradients = data?.map((subject, index) => ({
-                ...subject,
-                imgUrl: imgUrls[index]
-            })) || [];
-            
-            setSubjects(subjectsWithGradients);
-        };
-
         const fetchProfile = async () => {
             const {data: {session}} = await supabase.auth.getSession()
 
@@ -49,7 +30,6 @@ const Navbar = () => {
         }
 
         fetchProfile()
-        fetchSubjects()
 
         const {data: {subscription: authListener}} = supabase.auth.onAuthStateChange((_event, session) => {
             if (session) fetchProfile()
@@ -83,33 +63,21 @@ const Navbar = () => {
         await supabase.auth.signOut()
         setProfile(null)
     }
+
+    const closeMobile = () => (setIsMobileOpen(false))
     
+    const navLinkClass = ({ isActive }) => 
+  `flex-1 p-2 m-2 rounded-2xl transition-all ${isActive && !isMobileOpen ? "text-white bg-slate-800" : ""}`;
 
     return(
         <>
-            {/* Mobile Menu Button */}
-            <button
-                onClick={() => {
-                    if (navOpen) {
-                        closeSubject();
-                    } else {
-                        setNavOpen(true);
-                    }
-                }}
-                className="fixed top-6 right-6 z-50 md:hidden p-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white hover:bg-slate-700 transition">
-                {navOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-
-            <nav className={`fixed bg-slate-900/50 top-0 left-0 h-screen w-24 z-50 glass-nav border-r border-slate-800 flex flex-col items-center gap-6 py-6 transition-transform duration-300 md:translate-x-0 ${
-                navOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-            }`}>
+            <nav className={`hidden fixed bg-slate-900/50 top-0 left-0 h-screen w-24 z-50 glass-nav border-r border-slate-800 md:flex flex-col items-center gap-6 py-6 transition-transform duration-300 md:translate-x-0}`}>
                 {/* Logo */}
                 <div className="flex flex-col items-center gap-6">
                     <Link 
                         to="/" 
                         onClick={() => {
                             setSelectedSubject(null)
-                            setNavOpen(false)
                             setOpenProfile(false)
                         }}
                         className="w-16 h-16 rounded-3xl bg-gradient-to-br from-white to-white flex items-center justify-center text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 backdrop-blur-md border border-blue-400/30">
@@ -154,7 +122,6 @@ const Navbar = () => {
                         to="/clasament"
                         onClick={() => {
                             setSelectedSubject(null)
-                            setNavOpen(false)
                         }}
                         className={({ isActive }) => `w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
                             isActive
@@ -232,45 +199,68 @@ const Navbar = () => {
                 ></div>
             )}
 
-            {navOpen && (
-                <div 
-                    className="fixed inset-0 z-40 md:hidden" 
-                    onClick={() => setNavOpen(false)}
-                ></div>
-            )}
 
             {/* Mobile Menu Bottom */}
             
-            {/* <div className="w-full fixed bottom-0 bg-slate-900/50 glass-nav rounded-t-3xl border-t border-slate-600 z-10">
-                <ul className=" flex justify-around md:hidden lg:hidden list-none gap-1 text-slate-400 text-xs font-medium cursor-pointer">
+            <div className="w-[90%] fixed bottom-3 left-[50%] -translate-x-[50%] bg-black/30 glass-nav rounded-3xl border-t border-slate-700 z-10">
+                <ul className="flex justify-around md:hidden lg:hidden list-none text-slate-400 text-xs font-medium cursor-pointer">
                     <NavLink
                         to="/"
-                        className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
+                        onClick={closeMobile}
+                        className={navLinkClass}>
                         <div className="flex flex-col items-center gap-1">
                             <Home className="h-5 w-5" />
                             <span>Acasă</span>
                         </div>
                     </NavLink>
 
+                    <button
+                        onClick={() => setIsMobileOpen((p) => !p)}
+                        to="/cursuri"
+                        className={navLinkClass({ isActive: isMobileOpen })}>
+                        <div className="flex flex-col items-center gap-1">
+                            <Book className="h-5 w-5" />
+                            <span>Cursuri</span>
+                        </div>
+                    </button>
+
                     <NavLink
-                        to="/probleme"
-                        className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
+                        to="/feed"
+                        onClick={closeMobile}
+                        className={navLinkClass}>
                             <div className="flex flex-col items-center gap-1">
-                                <Code className="h-5 w-5" />
-                                <span>Probleme</span>
+                                <Compass className="h-5 w-5" />
+                                <span>Feed</span>
                             </div>
                     </NavLink>
 
                     <NavLink
                         to="/clasament"
-                        className={({ isActive }) => `py-4 ${isActive ? "text-white" : ""}`}>
+                        onClick={closeMobile}
+                        className={navLinkClass}>
                             <div className="flex flex-col items-center gap-1">
                                 <Trophy className="h-5 w-5" />
                                 <span>Clasament</span>
                             </div>
                     </NavLink>
+
+                    <NavLink
+                        to={`${profile ? `/utilizatori/${profile?.username}` : '/login'}`}
+                        onClick={closeMobile}
+                        className={navLinkClass}>
+                            <div className="flex flex-col items-center gap-1">
+                                <User className="h-5 w-5" />
+                                <span>Profil</span>
+                            </div>
+                    </NavLink>
                 </ul>
-            </div> */}
+            </div>
+
+            <div className="block md:hidden">
+                {isMobileOpen && (
+                    <MobileMenu onClose={closeMobile} />
+                )}
+            </div>
         </>
     );
 }

@@ -4,10 +4,7 @@ import { supabase } from "../supabaseClient";
 import { SubjectContext } from "./SubjectContext";
 
 const SidebarMenu = () => {
-    const { selectedSubject, setSelectedSubject, isClosing, closeSubject } = useContext(SubjectContext);
-    const [chapters, setChapters] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const location = useLocation();
+    const { chapters, selectedSubject, setSelectedSubject, isClosing, setIsClosing, closeSubject, loading } = useContext(SubjectContext);
     const prevSubjectRef = useRef(null)
     const [shouldAnimate, setShouldAnimate] = useState(false);
 
@@ -22,40 +19,17 @@ const SidebarMenu = () => {
         prevSubjectRef.current = selectedSubject;
     }, [selectedSubject]);
 
-    useEffect(() => {
-        if (!selectedSubject) { 
-            return;
-        }
-
-        setLoading(true);
-
-        const fetchChapters = async () => {
-            const { data: chaptersData, error } = await supabase
-                .from('chapters')
-                .select('id, title, slug, order_index')
-                .eq('subject_id', selectedSubject.id)
-                .eq('hidden', false)
-                .order('order_index', { ascending: true });
-
-            if (error) console.error("Error fetching chapters:", error);
-            setChapters(chaptersData || []);
-            setLoading(false);
-        };
-
-        fetchChapters();
-    }, [selectedSubject]);
-
-    if (!selectedSubject) return null;
+    if (!selectedSubject && !isClosing) return null;
 
     const animationClass = isClosing 
-        ? 'animate-out slide-out-to-left duration-200' 
+        ? 'animate-out slide-out-to-left duration-200 fill-mode-forwards' 
         : shouldAnimate 
         ? 'animate-in slide-in-from-left duration-200' 
         : '';
 
     if (loading) {
         return (
-            <aside className={`w-[80%] md:w-80 h-screen bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
+            <aside className={`hidden w-[80%] md:w-80 h-screen bg-slate-900 backdrop-blur-xl border-r border-slate-700/50 md:flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
                 <div className="p-6 space-y-4">
                     <div className="h-8 bg-slate-700 rounded w-3/4"></div>
                 </div>
@@ -64,7 +38,7 @@ const SidebarMenu = () => {
     }
 
     return (
-        <aside className={`w-[80%] md:w-80 h-screen bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
+        <aside className={`hidden w-[80%] md:w-80 h-screen bg-slate-900 backdrop-blur-xl border-r border-slate-700/50 md:flex flex-col overflow-hidden fixed left-24 top-0 z-40 ${animationClass}`}>
             
             <div className="p-6 border-b border-slate-700/50 flex-shrink-0 flex justify-between items-start">
                 <div className="w-[80%]">

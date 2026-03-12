@@ -24,7 +24,7 @@ const LessonPage = () => {
     const [loading, setLoading] = useState(true) 
     const [parent, setParent] = useState(null)
     const [nextLesson, setNextLesson] = useState(null)
-    const {navOpen} = useContext(SubjectContext)
+    const {selectedSubject, isClosing} = useContext(SubjectContext)
 
     const [completing, setCompleting] = useState(false)
     const [isCompleted, setIsCompleted] = useState(false)
@@ -217,7 +217,7 @@ const LessonPage = () => {
     if (!lesson) return <div className="text-white p-8">Lectia nu a fost gasita</div>
 
     return(
-        <div className={`min-h-screen bg-slate-950 text-slate-200 p-8 transition-all ${navOpen && 'ml-[200px]'}`}>
+        <div className={`min-h-screen bg-slate-950 text-slate-200 p-8 transition-all duration-200 ${selectedSubject && !isClosing && 'pl-[25%]'}`}>
             {/* Level Up Notification */}
             {showLevelUp && (
                 <LevelUpNotification 

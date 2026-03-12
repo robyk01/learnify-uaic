@@ -6,7 +6,7 @@ export default function MobileMenu( {onClose} ){
     const { subjects, chapters, selectedSubject, setSelectedSubject, handleSubjectClick } = useContext(SubjectContext)
 
     return(
-        <div className="fixed inset-0 m-4 bg-slate-950/80 glass-nav flex flex-col">
+        <div className="fixed inset-0 m-5 bg-slate-950/80 border border-slate-800 rounded-xl glass-nav flex flex-col">
 
             {/* Tabs */}
             <div className="flex border-b border-slate-800 flex-shrink-0 rounded-tl-xl rounded-tr-xl overflow-hidden">

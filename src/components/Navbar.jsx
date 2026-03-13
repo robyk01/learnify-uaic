@@ -2,67 +2,24 @@ import { useEffect, useState, useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { SubjectContext } from "./SubjectContext";
+import { ProfileContext } from "./ProfileContext";
 import MobileMenu from "./MobileMenu";
 
-import { Home, Book, Compass, Trophy, Settings, LogOut, User, X } from "lucide-react";
+import { Home, Book, Compass, Trophy, Settings, LogOut, User } from "lucide-react";
 
 const Navbar = () => {
     const { subjects, selectedSubject, setSelectedSubject, closeSubject, handleSubjectClick} = useContext(SubjectContext);
+    const { profile, setProfile } = useContext(ProfileContext)
 
-    const [profile, setProfile] = useState(null)
     const [openProfile, setOpenProfile] = useState(null)
 
     const [isMobileOpen, setIsMobileOpen] = useState(false)
     const [isClosingMobile, setIsClosingMobile] = useState(false)
 
+
     useEffect(() => {
-        const fetchProfile = async () => {
-            const {data: {session}} = await supabase.auth.getSession()
-
-            if (session?.user){
-                const {data} = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
-
-                setProfile(data)
-            } else {
-                setProfile(null)
-            }
-        }
-
-        fetchProfile()
-
-        const {data: {subscription: authListener}} = supabase.auth.onAuthStateChange((_event, session) => {
-            if (session) fetchProfile()
-            else setProfile(null)
-        })
-
-        const channel = supabase
-        .channel('realtime-navbar')
-        .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'profiles'
-        }, (payload) => {
-            setProfile(prevProfile => {
-                if (prevProfile && payload.new.id === prevProfile.id){
-                    return payload.new
-                }
-                return prevProfile
-            })
-        })
-        .subscribe()
-
         setIsMobileOpen(false);
         setIsClosingMobile(false);
-
-        return () => {
-            authListener.unsubscribe()
-            supabase.removeChannel(channel)
-        }
-
     }, [])
 
     const handleLogout = async () => {
@@ -83,9 +40,11 @@ const Navbar = () => {
 
     return(
         <>
-            <nav className={`hidden fixed bg-slate-900/50 top-0 left-0 h-screen w-24 z-50 glass-nav border-r border-slate-800 md:flex flex-col items-center gap-6 py-6 transition-transform duration-300 md:translate-x-0}`}>
-                {/* Logo */}
+            <nav className={`hidden fixed bg-slate-900/50 top-0 left-0 h-screen w-24 z-50 glass-nav border-r border-slate-800 md:flex flex-col items-center justify-between py-6 `}>
+                {/* Top */}
                 <div className="flex flex-col items-center gap-6">
+
+                    {/* Logo */}
                     <Link 
                         to="/" 
                         onClick={() => {
@@ -95,12 +54,26 @@ const Navbar = () => {
                         className="w-16 h-16 rounded-3xl bg-gradient-to-br from-white to-white flex items-center justify-center text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 backdrop-blur-md border border-blue-400/30">
                         <img src="/icon_blue.png" alt="Logo" className="h-8" />
                     </Link>
-                    <div className="w-12 h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
 
+                    {/* Feed */}
+                    <NavLink
+                        to="/feed"
+                        onClick={() => {
+                            setSelectedSubject(null)
+                        }}
+                        className={({ isActive }) => `w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md  transition-all duration-300 ${
+                            isActive
+                                ? "bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg shadow-blue-500/30"
+                                : "bg-slate-800/50 text-slate-400 border-slate-700/50 hover:text-white hover:shadow-lg"
+                        }`}>
+                        <Compass className="h-6 w-6" />
+                    </NavLink>
+
+                    <div className="w-12 h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent"></div>
                 </div>
 
                 {/* Desktop Menu */}
-                <div className="flex-1 flex flex-col items-center gap-4 overflow-y-auto scrollbar-hide">
+                <div className="flex-1 flex flex-col items-center mt-4 gap-4 overflow-y-auto scrollbar-hide">
                     {subjects.map((subject) => (
                         <button
                             key={subject.id}
@@ -135,9 +108,9 @@ const Navbar = () => {
                         onClick={() => {
                             setSelectedSubject(null)
                         }}
-                        className={({ isActive }) => `w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
+                        className={({ isActive }) => `w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 ${
                             isActive
-                                ? "bg-gradient-to-br from-yellow-500 to-yellow-600 text-white border-white/30 shadow-lg shadow-yellow-500/50"
+                                ? "bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg shadow-yellow-500/30"
                                 : "bg-slate-800/50 text-slate-400 border-slate-700/50 hover:text-white hover:shadow-lg"
                         }`}>
                         <Trophy className="h-6 w-6" />
@@ -214,11 +187,11 @@ const Navbar = () => {
 
             {/* Mobile Menu Bottom */}
             
-            <div className={`w-[90%] fixed bottom-3 left-[50%] -translate-x-[50%] bg-black/30 glass-nav rounded-3xl border-t border-slate-700 z-50`}>
+            <div className={`block md:hidden w-[90%] fixed bottom-3 left-[50%] -translate-x-[50%] bg-black/30 glass-nav rounded-3xl border-t border-slate-700 z-50`}>
                 <ul className="flex justify-around md:hidden lg:hidden list-none text-slate-400 text-xs font-medium cursor-pointer">
                     <NavLink
                         to="/"
-                        onClick={closeMobile}
+                        onClick={() => setIsMobileOpen(false)}
                         className={({ isActive }) => navLinkClass({ isActive, isMobileOpen })}>
                         <div className="flex flex-col items-center gap-1">
                             <Home className="h-5 w-5" />
@@ -238,7 +211,7 @@ const Navbar = () => {
 
                     <NavLink
                         to="/feed"
-                        onClick={closeMobile}
+                        onClick={() => setIsMobileOpen(false)}
                         className={({ isActive }) => navLinkClass({ isActive, isMobileOpen })}>
                             <div className="flex flex-col items-center gap-1">
                                 <Compass className="h-5 w-5" />
@@ -248,7 +221,7 @@ const Navbar = () => {
 
                     <NavLink
                         to="/clasament"
-                        onClick={closeMobile}
+                        onClick={() => setIsMobileOpen(false)}
                         className={({ isActive }) => navLinkClass({ isActive, isMobileOpen })}>
                             <div className="flex flex-col items-center gap-1">
                                 <Trophy className="h-5 w-5" />
@@ -258,7 +231,7 @@ const Navbar = () => {
 
                     <NavLink
                         to={`${profile ? `/utilizatori/${profile?.username}` : '/login'}`}
-                        onClick={closeMobile}
+                        onClick={() => setIsMobileOpen(false)}
                         className={({ isActive }) => navLinkClass({ isActive, isMobileOpen })}>
                             <div className="flex flex-col items-center gap-1">
                                 <User className="h-5 w-5" />

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { SubjectProvider } from "./components/SubjectContext";
+import { ProfileProvider } from "./components/ProfileContext";
 import Home from "./pages/Home";
 import ChapterPage from "./pages/ChapterPage";
 import LessonPage from './pages/LessonPage';
@@ -58,9 +59,11 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <SubjectProvider>
-        <AppContent />
-      </SubjectProvider>
+      <ProfileProvider>
+        <SubjectProvider>
+          <AppContent />
+        </SubjectProvider>
+      </ProfileProvider>
     </BrowserRouter>
   );
 }

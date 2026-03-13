@@ -217,7 +217,7 @@ const LessonPage = () => {
     if (!lesson) return <div className="text-white p-8">Lectia nu a fost gasita</div>
 
     return(
-        <div className={`min-h-screen bg-slate-950 text-slate-200 p-8 transition-all duration-200 ${selectedSubject && !isClosing && 'pl-[25%]'}`}>
+        <div className={`min-h-screen bg-slate-950 text-slate-200 p-8 transition-all duration-200 ${selectedSubject && !isClosing && 'md:pl-[25%]'}`}>
             {/* Level Up Notification */}
             {showLevelUp && (
                 <LevelUpNotification 

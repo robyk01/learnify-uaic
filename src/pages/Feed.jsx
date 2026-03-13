@@ -31,6 +31,10 @@ export default function Feed(){
     return(
         <div className='text-slate-200 p-8 mb-8 font-sans'>
             <div className="max-w-2xl mx-auto text-center">
+                <h1 className="text-3xl md:text-4xl font-bold text-white font-display mt-6 mb-12">
+                    Feed 
+                </h1>
+
                 {profile?.premium ? (
                     <div className="flex flex-col gap-12">
                         {feedPosts.map((post) => (

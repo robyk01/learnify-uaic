@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { SubjectProvider } from "./components/SubjectContext";
 import { ProfileProvider } from "./components/ProfileContext";
+import { usePremiumCheck } from "./hooks/usePremiumCheck";
+import ComingSoon from "./pages/ComingSoon";
 import Home from "./pages/Home";
 import ChapterPage from "./pages/ChapterPage";
 import LessonPage from './pages/LessonPage';
@@ -19,6 +21,8 @@ import Feed from "./pages/Feed";
 
 function AppContent() {
   const location = useLocation();
+  const { isPremium, loading } = usePremiumCheck();
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -28,6 +32,14 @@ function AppContent() {
                      location.pathname.startsWith('/probleme/');
 
   const showSidebar = location.pathname !== '/login';
+
+  if (loading) {
+    return <div className="min-h-screen bg-slate-950"></div>;
+  }
+
+  if (!isPremium) {
+    return <ComingSoon />;
+  }
 
   return (
     <>
